@@ -1,0 +1,81 @@
+<textarea name="{{ widget.name }}" id="id_{{ widget.name }}" style="display: none;">{{ widget.value }}</textarea>
+
+<div id="id_{{ widget.name }}_wrapper" style="width: 100%; max-width: 780px; position: relative;">
+    <button type="button" id="id_{{ widget.name }}_fullscreen_btn" title="Toggle Fullscreen" style="position: absolute; top: 8px; right: 8px; z-index: 10; padding: 6px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;">
+        <svg id="id_{{ widget.name }}_icon_expand" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+    </button>
+    <iframe 
+        id="id_{{ widget.name }}_iframe"
+        src="{{ widget.iframe_src }}"
+        style="width: 100%; border: 1px solid #ccc; border-radius: 4px;"
+    >
+    </iframe>
+</div>
+
+<style>
+    #id_{{ widget.name }}_wrapper:fullscreen {
+        background-color: #f8f9fa;
+        padding: 20px;
+        box-sizing: border-box;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    .cdx-settings-button {
+        width: auto;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const iframe = document.getElementById('id_{{ widget.name }}_iframe');
+        const hiddenTextarea = document.getElementById('id_{{ widget.name }}');
+        const fullscreenBtn = document.getElementById('id_{{ widget.name }}_fullscreen_btn');
+        const expandIcon = document.getElementById('id_{{ widget.name }}_icon_expand');
+        const wrapper = document.getElementById('id_{{ widget.name }}_wrapper');
+
+        const editorConfig = JSON.parse('{{ widget.config_json|escapejs }}');
+        const initialData = hiddenTextarea.value? JSON.parse(hiddenTextarea.value) : {};
+        const iframeOrigin = new URL(iframe.src).origin;
+
+        fullscreenBtn.addEventListener('click', function() {
+            if (!document.fullscreenElement) {
+                wrapper.requestFullscreen().catch(err => {
+                    alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        document.addEventListener('fullscreenchange', function() {
+            if (document.fullscreenElement === wrapper) {
+                fullscreenBtn.style.display = 'none';
+            } else {
+                fullscreenBtn.style.display = 'block';
+            }
+        });
+
+        if (typeof iFrameResize === 'function') {
+            iFrameResize({ log: false, checkOrigin: false }, iframe);
+        }
+
+        iframe.onload = function () {
+            iframe.contentWindow.postMessage({
+                type: 'init',
+                config: editorConfig,
+                initialData: initialData
+            }, iframeOrigin);
+        };
+
+        window.addEventListener('message', function (event) {
+            if (event.origin!== iframeOrigin) {
+                console.warn('Blocked message from untrusted origin:', event.origin);
+                return;
+            }
+
+            if (event.source === iframe.contentWindow && event.data.type === 'editor-data-update') {
+                hiddenTextarea.value = JSON.stringify(event.data.content);
+            }
+        });
+    });
+</script>

@@ -1,0 +1,105 @@
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EditorJS</title>
+    <style>
+        body { margin: 0; padding: 12px; font-family: sans-serif; }
+    </style>
+    
+    <link rel="stylesheet" href="{% static custom_css_file %}">
+
+</head>
+<body>
+    <div id="editorjs-holder"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.9/iframeResizer.contentWindow.min.js"></script>
+
+    {% for name, config in tools_config.items %}
+        {% if config.static %}
+            <script src="{% static config.script %}"></script>
+        {% else %}
+            <script src="{{ config.script }}"></script>
+        {% endif %}
+    {% endfor %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let editor;
+            const trustedOrigin = "{{ trusted_origin|escapejs }}";
+            const uploadImageUrl = "{{ upload_image_url|escapejs }}";
+            const csrfToken = "{{ csrf_token|escapejs }}";
+            let debounceTimer;
+
+            window.addEventListener('message', function (event) {
+
+                if (event.origin !== trustedOrigin) return;
+
+                if (event.data.type === 'init') {
+
+                    const toolsConfig = JSON.parse('{{ tools_json|escapejs }}');
+                    const tools = {};
+
+                    for (const name in toolsConfig) {
+                        const config = toolsConfig[name];
+                        const toolClass = window[config.class];
+
+                        if (toolClass) {
+                            if (name === 'image') {
+                                tools[name] = {
+                                    class: toolClass,
+                                    config: {
+                                        endpoints: { byFile: uploadImageUrl },
+                                        additionalRequestHeaders: { 'X-CSRFToken': csrfToken }
+                                    }
+                                };
+                            } 
+                            else if (config.config) {
+                                tools[name] = { class: toolClass, ...config.config };
+                            }
+                            else {
+                                tools[name] = toolClass;
+                            }
+                        }
+                    }
+
+                    editor = new EditorJS({
+                        holder: 'editorjs-holder',
+                        tools: tools,
+                        data: event.data.initialData,
+                        placeholder: '{% trans "Write something..." %}',
+
+                        onReady: () => {
+                            if (window.parentIFrame) {
+                                window.parentIFrame.size();
+                            }
+                        },
+
+                        onChange: (api, event) => {
+                            clearTimeout(debounceTimer);
+
+                            debounceTimer = setTimeout(() => {
+                                api.saver.save().then((outputData) => {
+                                    window.parent.postMessage({
+                                        type: 'editor-data-update',
+                                        content: outputData
+                                    }, trustedOrigin);
+                                }).catch((error) => {
+                                    console.error('Saving failed: ', error);
+                                });
+
+                                if (window.parentIFrame) {
+                                    window.parentIFrame.size();
+                                }
+                            }, 250); 
+                        }
+                    });
+                    
+                }
+            });
+        });
+    </script>
+</body>
+</html>

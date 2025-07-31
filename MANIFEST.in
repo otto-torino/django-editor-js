@@ -1,0 +1,4 @@
+graft editor_js/templates
+graft editor_js/static
+include LICENSE
+include README.md
