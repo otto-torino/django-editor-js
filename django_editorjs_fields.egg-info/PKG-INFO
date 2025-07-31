@@ -1,5 +1,5 @@
 Metadata-Version: 2.4
-Name: django-editorjs-fields
+Name: django-editor-js
 Version: 0.1.0
 Summary: A Django library to integrate the Editor.js editor with image handling and custom tools.
 Author-email: Otto <info@otto.to.it>
