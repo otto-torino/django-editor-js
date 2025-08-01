@@ -9,7 +9,7 @@ from .utils import get_editorjs_storage
 def _delete_editorjs_images_on_delete(sender, instance, **kwargs):
     """
     Deletes all images used in all EditorJS fields of the given instance.
-    
+
     This function is meant to be used as a post_delete signal handler.
     """
     for field in sender._meta.get_fields():
@@ -20,14 +20,14 @@ def _delete_editorjs_images_on_delete(sender, instance, **kwargs):
 
             urls_to_delete = field._extract_image_urls(data)
             storage = get_editorjs_storage()
-            base_url = getattr(storage, 'base_url', None)
+            base_url = getattr(storage, "base_url", None)
 
             if not base_url:
                 continue
 
             for url in urls_to_delete:
                 if url.startswith(base_url):
-                    relative_path = url.replace(base_url, '', 1).lstrip('/')
+                    relative_path = url.replace(base_url, "", 1).lstrip("/")
                     decoded_path = unquote(relative_path)
                     try:
                         if storage.exists(decoded_path):
@@ -47,14 +47,14 @@ class EditorJSField(models.JSONField):
         :param config: A dictionary with the configuration for the Editor.js
             iframe widget.
         """
-        self.config = kwargs.pop('config', {})
+        self.config = kwargs.pop("config", {})
         super().__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):
         """
         Return a form field for the Editor.js data.
         """
-        kwargs['widget'] = EditorJsIframeWidget(attrs={'config': self.config})
+        kwargs["widget"] = EditorJsIframeWidget(attrs={"config": self.config})
         return super().formfield(**kwargs)
 
     def contribute_to_class(self, cls, name, **kwargs):
@@ -63,8 +63,10 @@ class EditorJSField(models.JSONField):
         used in the Editor.js data when the instance is deleted.
         """
         super().contribute_to_class(cls, name, **kwargs)
-        if not hasattr(cls, '_editorjs_delete_signal_connected'):
-            post_delete.connect(_delete_editorjs_images_on_delete, sender=cls, weak=False)
+        if not hasattr(cls, "_editorjs_delete_signal_connected"):
+            post_delete.connect(
+                _delete_editorjs_images_on_delete, sender=cls, weak=False
+            )
             cls._editorjs_delete_signal_connected = True
 
     def _extract_image_urls(self, data):
@@ -72,12 +74,12 @@ class EditorJSField(models.JSONField):
         Extract the URLs of the images used in the Editor.js data.
         """
         image_urls = []
-        if not isinstance(data, dict) or 'blocks' not in data:
+        if not isinstance(data, dict) or "blocks" not in data:
             return image_urls
-        for block in data.get('blocks',):
-            if block.get('type') == 'image':
-                file_data = block.get('data', {}).get('file', {})
-                url = file_data.get('url')
+        for block in data.get("blocks", []):
+            if block.get("type") == "image":
+                file_data = block.get("data", {}).get("file", {})
+                url = file_data.get("url")
                 if url:
                     image_urls.append(url)
         return image_urls
@@ -91,7 +93,9 @@ class EditorJSField(models.JSONField):
         old_value = None
         if model_instance.pk:
             try:
-                old_instance = model_instance.__class__.objects.get(pk=model_instance.pk)
+                old_instance = model_instance.__class__.objects.get(
+                    pk=model_instance.pk
+                )
                 old_value = getattr(old_instance, self.attname)
             except model_instance.__class__.DoesNotExist:
                 pass
@@ -102,12 +106,12 @@ class EditorJSField(models.JSONField):
 
         if urls_to_delete:
             storage = get_editorjs_storage()
-            base_url = getattr(storage, 'base_url', None)
+            base_url = getattr(storage, "base_url", None)
 
             if base_url:
                 for url in urls_to_delete:
                     if url.startswith(base_url):
-                        relative_path = url.replace(base_url, '', 1).lstrip('/')
+                        relative_path = url.replace(base_url, "", 1).lstrip("/")
                         decoded_path = unquote(relative_path)
                         try:
                             if storage.exists(decoded_path):
