@@ -1,0 +1,348 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Reference &mdash; django-editor-js 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Configuration" href="configuration.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            django-editor-js
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-editor_js.fields">Fields</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#editor_js.fields.EditorJSField"><code class="docutils literal notranslate"><span class="pre">EditorJSField</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#editor_js.fields.EditorJSField.contribute_to_class"><code class="docutils literal notranslate"><span class="pre">EditorJSField.contribute_to_class()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#editor_js.fields.EditorJSField.formfield"><code class="docutils literal notranslate"><span class="pre">EditorJSField.formfield()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#editor_js.fields.EditorJSField.pre_save"><code class="docutils literal notranslate"><span class="pre">EditorJSField.pre_save()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-editor_js.widgets">Widgets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#editor_js.widgets.EditorJsIframeWidget"><code class="docutils literal notranslate"><span class="pre">EditorJsIframeWidget</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#editor_js.widgets.EditorJsIframeWidget.Media"><code class="docutils literal notranslate"><span class="pre">EditorJsIframeWidget.Media</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#editor_js.widgets.EditorJsIframeWidget.get_context"><code class="docutils literal notranslate"><span class="pre">EditorJsIframeWidget.get_context()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#editor_js.widgets.EditorJsIframeWidget.media"><code class="docutils literal notranslate"><span class="pre">EditorJsIframeWidget.media</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#editor_js.widgets.EditorJsIframeWidget.template_name"><code class="docutils literal notranslate"><span class="pre">EditorJsIframeWidget.template_name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-editor_js.renderers">Renderers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#editor_js.renderers.EditorJsRenderer"><code class="docutils literal notranslate"><span class="pre">EditorJsRenderer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#editor_js.renderers.EditorJsRenderer.escape"><code class="docutils literal notranslate"><span class="pre">EditorJsRenderer.escape()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#editor_js.renderers.EditorJsRenderer.render"><code class="docutils literal notranslate"><span class="pre">EditorJsRenderer.render()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#editor_js.renderers.EditorJsRenderer.render_block"><code class="docutils literal notranslate"><span class="pre">EditorJsRenderer.render_block()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#editor_js.renderers.EditorJsRenderer.render_button"><code class="docutils literal notranslate"><span class="pre">EditorJsRenderer.render_button()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#editor_js.renderers.EditorJsRenderer.render_code"><code class="docutils literal notranslate"><span class="pre">EditorJsRenderer.render_code()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#editor_js.renderers.EditorJsRenderer.render_divider"><code class="docutils literal notranslate"><span class="pre">EditorJsRenderer.render_divider()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#editor_js.renderers.EditorJsRenderer.render_embed"><code class="docutils literal notranslate"><span class="pre">EditorJsRenderer.render_embed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#editor_js.renderers.EditorJsRenderer.render_header"><code class="docutils literal notranslate"><span class="pre">EditorJsRenderer.render_header()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#editor_js.renderers.EditorJsRenderer.render_image"><code class="docutils literal notranslate"><span class="pre">EditorJsRenderer.render_image()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#editor_js.renderers.EditorJsRenderer.render_list"><code class="docutils literal notranslate"><span class="pre">EditorJsRenderer.render_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#editor_js.renderers.EditorJsRenderer.render_paragraph"><code class="docutils literal notranslate"><span class="pre">EditorJsRenderer.render_paragraph()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#editor_js.renderers.EditorJsRenderer.render_quote"><code class="docutils literal notranslate"><span class="pre">EditorJsRenderer.render_quote()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#editor_js.renderers.EditorJsRenderer.render_raw"><code class="docutils literal notranslate"><span class="pre">EditorJsRenderer.render_raw()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#editor_js.renderers.EditorJsRenderer.render_table"><code class="docutils literal notranslate"><span class="pre">EditorJsRenderer.render_table()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#editor_js.renderers.EditorJsRenderer.render_unknown"><code class="docutils literal notranslate"><span class="pre">EditorJsRenderer.render_unknown()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-editor_js.templatetags.editor_js_filters">Template Filters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#editor_js.templatetags.editor_js_filters.editorjs"><code class="docutils literal notranslate"><span class="pre">editorjs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#editor_js.templatetags.editor_js_filters.get_renderer_class"><code class="docutils literal notranslate"><span class="pre">get_renderer_class()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-editor_js.utils">Utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#editor_js.utils.get_editorjs_config"><code class="docutils literal notranslate"><span class="pre">get_editorjs_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#editor_js.utils.get_editorjs_storage"><code class="docutils literal notranslate"><span class="pre">get_editorjs_storage()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">django-editor-js</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">API Reference</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/api_reference.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="api-reference">
+<h1>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading"></a></h1>
+<p>This section provides auto-generated documentation from the library’s source code.</p>
+<section id="module-editor_js.fields">
+<span id="fields"></span><h2>Fields<a class="headerlink" href="#module-editor_js.fields" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="editor_js.fields.EditorJSField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">editor_js.fields.</span></span><span class="sig-name descname"><span class="pre">EditorJSField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/fields.html#EditorJSField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.fields.EditorJSField" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">JSONField</span></code></p>
+<p>A JSONField that stores Editor.js data. It deletes the images used in the
+Editor.js data when the instance is deleted.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="editor_js.fields.EditorJSField.contribute_to_class">
+<span class="sig-name descname"><span class="pre">contribute_to_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/fields.html#EditorJSField.contribute_to_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.fields.EditorJSField.contribute_to_class" title="Link to this definition"></a></dt>
+<dd><p>Connect a post_delete signal to the model class to delete the images
+used in the Editor.js data when the instance is deleted.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="editor_js.fields.EditorJSField.formfield">
+<span class="sig-name descname"><span class="pre">formfield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/fields.html#EditorJSField.formfield"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.fields.EditorJSField.formfield" title="Link to this definition"></a></dt>
+<dd><p>Return a form field for the Editor.js data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="editor_js.fields.EditorJSField.pre_save">
+<span class="sig-name descname"><span class="pre">pre_save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/fields.html#EditorJSField.pre_save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.fields.EditorJSField.pre_save" title="Link to this definition"></a></dt>
+<dd><p>Delete the images that are no longer used in the Editor.js data when
+the instance is saved.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-editor_js.widgets">
+<span id="widgets"></span><h2>Widgets<a class="headerlink" href="#module-editor_js.widgets" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="editor_js.widgets.EditorJsIframeWidget">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">editor_js.widgets.</span></span><span class="sig-name descname"><span class="pre">EditorJsIframeWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attrs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/widgets.html#EditorJsIframeWidget"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.widgets.EditorJsIframeWidget" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Widget</span></code></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="editor_js.widgets.EditorJsIframeWidget.Media">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Media</span></span><a class="reference internal" href="_modules/editor_js/widgets.html#EditorJsIframeWidget.Media"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.widgets.EditorJsIframeWidget.Media" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="editor_js.widgets.EditorJsIframeWidget.Media.js">
+<span class="sig-name descname"><span class="pre">js</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.9/iframeResizer.min.js',)</span></em><a class="headerlink" href="#editor_js.widgets.EditorJsIframeWidget.Media.js" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="editor_js.widgets.EditorJsIframeWidget.get_context">
+<span class="sig-name descname"><span class="pre">get_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/widgets.html#EditorJsIframeWidget.get_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.widgets.EditorJsIframeWidget.get_context" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="editor_js.widgets.EditorJsIframeWidget.media">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#editor_js.widgets.EditorJsIframeWidget.media" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="editor_js.widgets.EditorJsIframeWidget.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'editor_js/admin/widgets/editorjs_widget.html'</span></em><a class="headerlink" href="#editor_js.widgets.EditorJsIframeWidget.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-editor_js.renderers">
+<span id="renderers"></span><h2>Renderers<a class="headerlink" href="#module-editor_js.renderers" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="editor_js.renderers.EditorJsRenderer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">editor_js.renderers.</span></span><span class="sig-name descname"><span class="pre">EditorJsRenderer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/renderers.html#EditorJsRenderer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.renderers.EditorJsRenderer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="editor_js.renderers.EditorJsRenderer.escape">
+<span class="sig-name descname"><span class="pre">escape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/renderers.html#EditorJsRenderer.escape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.renderers.EditorJsRenderer.escape" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="editor_js.renderers.EditorJsRenderer.render">
+<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/renderers.html#EditorJsRenderer.render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.renderers.EditorJsRenderer.render" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="editor_js.renderers.EditorJsRenderer.render_block">
+<span class="sig-name descname"><span class="pre">render_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/renderers.html#EditorJsRenderer.render_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.renderers.EditorJsRenderer.render_block" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="editor_js.renderers.EditorJsRenderer.render_button">
+<span class="sig-name descname"><span class="pre">render_button</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/renderers.html#EditorJsRenderer.render_button"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.renderers.EditorJsRenderer.render_button" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="editor_js.renderers.EditorJsRenderer.render_code">
+<span class="sig-name descname"><span class="pre">render_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/renderers.html#EditorJsRenderer.render_code"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.renderers.EditorJsRenderer.render_code" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="editor_js.renderers.EditorJsRenderer.render_divider">
+<span class="sig-name descname"><span class="pre">render_divider</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/renderers.html#EditorJsRenderer.render_divider"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.renderers.EditorJsRenderer.render_divider" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="editor_js.renderers.EditorJsRenderer.render_embed">
+<span class="sig-name descname"><span class="pre">render_embed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/renderers.html#EditorJsRenderer.render_embed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.renderers.EditorJsRenderer.render_embed" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="editor_js.renderers.EditorJsRenderer.render_header">
+<span class="sig-name descname"><span class="pre">render_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/renderers.html#EditorJsRenderer.render_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.renderers.EditorJsRenderer.render_header" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="editor_js.renderers.EditorJsRenderer.render_image">
+<span class="sig-name descname"><span class="pre">render_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/renderers.html#EditorJsRenderer.render_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.renderers.EditorJsRenderer.render_image" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="editor_js.renderers.EditorJsRenderer.render_list">
+<span class="sig-name descname"><span class="pre">render_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/renderers.html#EditorJsRenderer.render_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.renderers.EditorJsRenderer.render_list" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="editor_js.renderers.EditorJsRenderer.render_paragraph">
+<span class="sig-name descname"><span class="pre">render_paragraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/renderers.html#EditorJsRenderer.render_paragraph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.renderers.EditorJsRenderer.render_paragraph" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="editor_js.renderers.EditorJsRenderer.render_quote">
+<span class="sig-name descname"><span class="pre">render_quote</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/renderers.html#EditorJsRenderer.render_quote"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.renderers.EditorJsRenderer.render_quote" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="editor_js.renderers.EditorJsRenderer.render_raw">
+<span class="sig-name descname"><span class="pre">render_raw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/renderers.html#EditorJsRenderer.render_raw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.renderers.EditorJsRenderer.render_raw" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="editor_js.renderers.EditorJsRenderer.render_table">
+<span class="sig-name descname"><span class="pre">render_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/renderers.html#EditorJsRenderer.render_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.renderers.EditorJsRenderer.render_table" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="editor_js.renderers.EditorJsRenderer.render_unknown">
+<span class="sig-name descname"><span class="pre">render_unknown</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/renderers.html#EditorJsRenderer.render_unknown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.renderers.EditorJsRenderer.render_unknown" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-editor_js.templatetags.editor_js_filters">
+<span id="template-filters"></span><h2>Template Filters<a class="headerlink" href="#module-editor_js.templatetags.editor_js_filters" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="editor_js.templatetags.editor_js_filters.editorjs">
+<span class="sig-prename descclassname"><span class="pre">editor_js.templatetags.editor_js_filters.</span></span><span class="sig-name descname"><span class="pre">editorjs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/templatetags/editor_js_filters.html#editorjs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.templatetags.editor_js_filters.editorjs" title="Link to this definition"></a></dt>
+<dd><p>Filter that renders the Editor.js JSON using the class specified
+in the settings or the default class.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="editor_js.templatetags.editor_js_filters.get_renderer_class">
+<span class="sig-prename descclassname"><span class="pre">editor_js.templatetags.editor_js_filters.</span></span><span class="sig-name descname"><span class="pre">get_renderer_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/templatetags/editor_js_filters.html#get_renderer_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.templatetags.editor_js_filters.get_renderer_class" title="Link to this definition"></a></dt>
+<dd><p>Reads the path to the renderer class from settings,
+otherwise returns our default class.</p>
+</dd></dl>
+
+</section>
+<section id="module-editor_js.utils">
+<span id="utilities"></span><h2>Utilities<a class="headerlink" href="#module-editor_js.utils" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="editor_js.utils.get_editorjs_config">
+<span class="sig-prename descclassname"><span class="pre">editor_js.utils.</span></span><span class="sig-name descname"><span class="pre">get_editorjs_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/utils.html#get_editorjs_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.utils.get_editorjs_config" title="Link to this definition"></a></dt>
+<dd><p>Returns the final configuration for Editor.js, merging the library defaults
+with the user’s custom settings.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="editor_js.utils.get_editorjs_storage">
+<span class="sig-prename descclassname"><span class="pre">editor_js.utils.</span></span><span class="sig-name descname"><span class="pre">get_editorjs_storage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/utils.html#get_editorjs_storage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.utils.get_editorjs_storage" title="Link to this definition"></a></dt>
+<dd><p>Helper function to get the storage class.
+Uses the class specified in settings.EDITOR_JS,
+otherwise falls back to default_storage.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="configuration.html" class="btn btn-neutral float-left" title="Configuration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Otto.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
