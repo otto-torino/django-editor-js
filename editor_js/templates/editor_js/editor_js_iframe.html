@@ -14,7 +14,7 @@
     data-trusted-origin="{{ trusted_origin|escapejs }}"
     data-upload-image-url="{{ upload_image_url|escapejs }}"
     data-csrf-token="{{ csrf_token|escapejs }}"
-    data-tools-json="{{ tools_json|escapejs }}"
+    data-tools-json='{{ tools_json }}'
     data-placeholder="{% trans 'Write something...' %}"
 >
     <div id="editor-js-holder"></div>

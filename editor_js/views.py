@@ -17,6 +17,8 @@ def editor_js_iframe_view(request):
     tools_config = config.get('TOOLS', {})
     css_file = config.get('CSS_FILE')
 
+    print(f"[DjangoEditorJSIframe] Loaded with config: {tools_config}")
+
     return render(request, 'editor_js/editor_js_iframe.html', {
         "trusted_origin": origin,
         "upload_image_url": reverse('editor_js_image_upload'),
