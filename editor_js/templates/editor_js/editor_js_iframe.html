@@ -1,0 +1,41 @@
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EditorJS</title>
+    <style>
+        body { margin: 0; padding: 12px; font-family: sans-serif; }
+    </style>
+    
+    <link rel="stylesheet" href="{% static custom_css_file %}">
+</head>
+<body 
+    data-trusted-origin="{{ trusted_origin|escapejs }}"
+    data-upload-image-url="{{ upload_image_url|escapejs }}"
+    data-csrf-token="{{ csrf_token|escapejs }}"
+    data-tools-json="{{ tools_json|escapejs }}"
+    data-placeholder="{% trans 'Write something...' %}"
+>
+    <div id="editor-js-holder"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.9/iframeResizer.contentWindow.min.js"></script>
+
+    {% for name, config in tools_config.items %}
+        {% if config.static %}
+            <script src="{% static config.script %}"></script>
+        {% else %}
+            <script src="{{ config.script }}"></script>
+        {% endif %}
+    {% endfor %}
+
+    <script src="{% static 'editor_js/js/editor_js_iframe.js' %}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            window.DjangoEditorJSIframe.init();
+        });
+    </script>
+</body>
+</html>

@@ -3,10 +3,10 @@ from django.db.models.signals import post_delete
 from urllib.parse import unquote
 
 from .widgets import EditorJsIframeWidget
-from .utils import get_editorjs_storage
+from .config import get_editor_js_storage
 
 
-def _delete_editorjs_images_on_delete(sender, instance, **kwargs):
+def _delete_editor_js_images_on_delete(sender, instance, **kwargs):
     """
     Deletes all images used in all EditorJS fields of the given instance.
 
@@ -19,7 +19,7 @@ def _delete_editorjs_images_on_delete(sender, instance, **kwargs):
                 continue
 
             urls_to_delete = field._extract_image_urls(data)
-            storage = get_editorjs_storage()
+            storage = get_editor_js_storage()
             base_url = getattr(storage, "base_url", None)
 
             if not base_url:
@@ -63,11 +63,11 @@ class EditorJSField(models.JSONField):
         used in the Editor.js data when the instance is deleted.
         """
         super().contribute_to_class(cls, name, **kwargs)
-        if not hasattr(cls, "_editorjs_delete_signal_connected"):
+        if not hasattr(cls, "_editor_js_delete_signal_connected"):
             post_delete.connect(
-                _delete_editorjs_images_on_delete, sender=cls, weak=False
+                _delete_editor_js_images_on_delete, sender=cls, weak=False
             )
-            cls._editorjs_delete_signal_connected = True
+            cls._editor_js_delete_signal_connected = True
 
     def _extract_image_urls(self, data):
         """
@@ -105,7 +105,7 @@ class EditorJSField(models.JSONField):
         urls_to_delete = old_image_urls - new_image_urls
 
         if urls_to_delete:
-            storage = get_editorjs_storage()
+            storage = get_editor_js_storage()
             base_url = getattr(storage, "base_url", None)
 
             if base_url:

@@ -3,14 +3,14 @@ from django import forms
 from django.urls import reverse
 
 class EditorJsIframeWidget(forms.Widget):
-    template_name = 'editor_js/admin/widgets/editorjs_widget.html'
+    template_name = 'editor_js/admin/widgets/editor_js_widget.html'
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         
         config = attrs.pop('config', {})
         context['widget']['config_json'] = json.dumps(config)        
-        context['widget']['iframe_src'] = reverse('editorjs_iframe')
+        context['widget']['iframe_src'] = reverse('editor_js_iframe')
         return context
 
     class Media:

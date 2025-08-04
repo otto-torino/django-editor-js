@@ -50,7 +50,7 @@ This library provides a custom `EditorJSField` for your models and a sandboxed i
     
     urlpatterns = [
         path('admin/', admin.site.urls),
-        path('editorjs/', include('editor_js.urls')),
+        path('editor-js/', include('editor_js.urls')),
         # ... your other urls
     ]
     ```

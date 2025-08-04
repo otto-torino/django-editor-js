@@ -125,8 +125,8 @@ class EditorJsRenderer:
     def render_button(self, data):
         text = self.escape(data.get("text", ""))
         url = self.escape(data.get("url", "#"))
-        css_class = data.get("css", {}).get("btnColor", "btn-secondary")
-        alignment = data.get("alignment", "left")
+        css_class = self.escape(data.get("btnColor", "btn-secondary"))
+        alignment = self.escape(data.get("alignment", "left"))
 
         button_html = f'<a href="{url}" class="btn {css_class}">{text}</a>'
 

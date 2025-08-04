@@ -39,24 +39,24 @@ DEFAULT_EDITOR_JS_TOOLS = {
     },
     'button': {
         'class': 'ButtonTool',
-        'script': 'editor_js/js/button-tool.js',
+        'script': 'editor_js/js/plugins/button-tool.js',
         'static': True,
     },
     'divider': {
         'class': 'DividerTool',
-        'script': 'editor_js/js/divider-tool.js',
+        'script': 'editor_js/js/plugins/divider-tool.js',
         'static': True,
     }
 }
 
-def get_editorjs_config():
+def get_editor_js_config():
     """
     Returns the final configuration for Editor.js, merging the library defaults
     with the user's custom settings.
     """
     config = {
         'STORAGE_BACKEND': None,
-        'CSS_FILE': 'editor_js/css/editorjs_admin.css',
+        'CSS_FILE': 'editor_js/css/editor_js_admin.css',
         'RENDERER_CLASS': 'editor_js.renderers.EditorJsRenderer',
         'TOOLS': DEFAULT_EDITOR_JS_TOOLS
     }
@@ -72,13 +72,13 @@ def get_editorjs_config():
     
     return config
 
-def get_editorjs_storage():
+def get_editor_js_storage():
     """
     Helper function to get the storage class.
     Uses the class specified in settings.EDITOR_JS,
     otherwise falls back to default_storage.
     """
-    config = get_editorjs_config()
+    config = get_editor_js_config()
     storage_path = config.get('STORAGE_BACKEND')
 
     if storage_path:

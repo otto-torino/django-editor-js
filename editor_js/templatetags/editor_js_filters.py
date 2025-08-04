@@ -23,7 +23,7 @@ def get_renderer_class():
     return EditorJsRenderer
 
 @register.filter(name='render_editor_js')
-def editorjs(value):
+def editor_js(value):
     """
     Filter that renders the Editor.js JSON using the class specified
     in the settings or the default class.
@@ -34,5 +34,4 @@ def editorjs(value):
     Renderer = get_renderer_class()
     renderer_instance = Renderer(value)
     
-    # Rendering is already safe due to how the class is written
     return mark_safe(renderer_instance.render())

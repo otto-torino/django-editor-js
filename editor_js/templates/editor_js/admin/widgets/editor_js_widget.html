@@ -1,0 +1,42 @@
+{% load static %}
+
+<textarea name="{{ widget.name }}" id="id_{{ widget.name }}" style="display: none;">{{ widget.value }}</textarea>
+
+<div 
+    id="id_{{ widget.name }}_wrapper" 
+    class="editor-js-widget-wrapper"
+    style="width: 100%; max-width: 780px; position: relative;"
+    data-widget-name="{{ widget.name }}"
+    data-config-json="{{ widget.config_json|escapejs }}"
+>
+    <button type="button" id="id_{{ widget.name }}_fullscreen_btn" title="Toggle Fullscreen" style="position: absolute; top: 8px; right: 8px; z-index: 10; padding: 6px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;">
+        <svg id="id_{{ widget.name }}_icon_expand" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+    </button>
+    <iframe 
+        id="id_{{ widget.name }}_iframe"
+        src="{{ widget.iframe_src }}"
+        style="width: 100%; border: 1px solid #ccc; border-radius: 4px;"
+    >
+    </iframe>
+</div>
+
+<style>
+    .editor-js-widget-wrapper:fullscreen {
+        background-color: #f8f9fa;
+        padding: 20px;
+        box-sizing: border-box;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    .cdx-settings-button {
+        width: auto;
+    }
+</style>
+
+<script src="{% static 'editor_js/js/editor_js_widget.js' %}"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        window.DjangoEditorJSWidget.init('.editor-js-widget-wrapper');
+    });
+</script>
