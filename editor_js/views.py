@@ -15,15 +15,13 @@ def editor_js_iframe_view(request):
 
     config = get_editor_js_config()
     tools_config = config.get('TOOLS', {})
-    css_file = config.get('CSS_FILE')
-
-    # print(f"[DjangoEditorJSIframe] Loaded with config: {tools_config}")
+    css_files = config.get('CSS_FILES', [])
 
     return render(request, 'editor_js/editor_js_iframe.html', {
         "trusted_origin": origin,
         "upload_image_url": reverse('editor_js_image_upload'),
         "csrf_token": csrf_token,
-        "custom_css_file": css_file,
+        "css_files": css_files,
         "tools_config": tools_config, 
         "tools_json": json.dumps(tools_config)
     })

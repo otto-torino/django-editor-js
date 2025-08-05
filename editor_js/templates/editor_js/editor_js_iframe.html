@@ -8,7 +8,8 @@
         body { margin: 0; padding: 12px; font-family: sans-serif; }
     </style>
     
-    <link rel="stylesheet" href="{% static custom_css_file %}">
+    {% for css_file in css_files %}<link rel="stylesheet" href="{% static css_file %}"> {% endfor %}
+
 </head>
 <body 
     data-trusted-origin="{{ trusted_origin|escapejs }}"

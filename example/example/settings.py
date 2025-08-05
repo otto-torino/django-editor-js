@@ -123,5 +123,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # You can uncomment and modify it for customization.
 #
 # EDITOR_JS = {
-#     "CSS_FILE": "blog/css/custom_editor_style.css",
+#     "CSS_FILES": ["example/css/main_style.css", "blog/css/blog_style.css"],
 # }

@@ -56,7 +56,7 @@ def get_editor_js_config():
     """
     config = {
         'STORAGE_BACKEND': None,
-        'CSS_FILE': 'editor_js/css/editor_js_admin.css',
+        'CSS_FILES': ['editor_js/css/editor_js_admin.css',],
         'RENDERER_CLASS': 'editor_js.renderers.EditorJsRenderer',
         'TOOLS': DEFAULT_EDITOR_JS_TOOLS
     }
