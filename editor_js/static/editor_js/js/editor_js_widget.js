@@ -2,7 +2,7 @@
  * Django EditorJS Widget Library
  * * Manages the widget iframe, fullscreen mode, and communication
  * between the main page and the editor iframe.
- * * @version 0.1.0
+ * * @version 0.1.1
  * @author Otto
  */
 (function(window, document) {

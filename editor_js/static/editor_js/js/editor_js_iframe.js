@@ -2,7 +2,7 @@
  * Django EditorJS Iframe Library
  * * Manages the Editor.js instance inside the iframe, its configuration,
  * and sending updated data to the parent page.
- * * @version 0.1.0
+ * * @version 0.1.1
  * @author Otto
  */
 (function(window, document) {
