@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "django-editor-js"
 version = "0.1.0"
 authors = [
-    { name = "Otto", email = "info@otto.to.it" },
+    { name = "Otto", email = "opensource@otto.srl" },
 ]
 description = "A Django library to integrate the Editor.js editor with image handling and custom tools."
 readme = "README.md"

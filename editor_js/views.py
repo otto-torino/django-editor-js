@@ -28,18 +28,26 @@ def editor_js_iframe_view(request):
 
 @csrf_exempt
 def image_upload_view(request):
-    if request.method == 'POST' and request.FILES.get('image'):
+    if request.method != 'POST' or not request.FILES.get('image'):
+        return JsonResponse({'success': 0, 'message': 'Invalid request method or no image provided.'})
 
-        storage = get_editor_js_storage()
+    image_file = request.FILES['image']
 
-        image_file = request.FILES['image']
-        file_name = storage.save(f'editor_js/{image_file.name}', image_file)
-        file_url = storage.url(file_name)
-        
+    allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+    if image_file.content_type not in allowed_types:
         return JsonResponse({
-            'success': 1,
-            'file': {
-                'url': file_url,
-            }
+            'success': 0, 
+            'message': f'Invalid file type: {image_file.content_type}.'
         })
-    return JsonResponse({'success': 0})
+
+    storage = get_editor_js_storage()
+    
+    file_name = storage.save(f'editor_js/{image_file.name}', image_file)
+    file_url = storage.url(file_name)
+    
+    return JsonResponse({
+        'success': 1,
+        'file': {
+            'url': file_url,
+        }
+    })
