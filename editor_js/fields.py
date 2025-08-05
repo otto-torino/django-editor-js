@@ -44,17 +44,21 @@ class EditorJSField(models.JSONField):
 
     def __init__(self, *args, **kwargs):
         """
-        :param config: A dictionary with the configuration for the Editor.js
-            iframe widget.
+        :param tools: A dictionary with a specific tool configuration for this field,
+                      overriding the global settings.
         """
-        self.config = kwargs.pop("config", {})
+        self.tools = kwargs.pop("tools", None)
         super().__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):
         """
         Return a form field for the Editor.js data.
         """
-        kwargs["widget"] = EditorJsIframeWidget(attrs={"config": self.config})
+        config = {}
+        if self.tools:
+            config['tools'] = self.tools
+        
+        kwargs["widget"] = EditorJsIframeWidget(attrs={"config": config})
         return super().formfield(**kwargs)
 
     def contribute_to_class(self, cls, name, **kwargs):

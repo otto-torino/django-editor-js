@@ -92,8 +92,14 @@ This library provides a custom `EditorJSField` for your models and a sandboxed i
 
 ### In Your Models
 
-Use the `EditorJSField` in your models just like any other field. It stores the editor's output as JSON.
+Use the `EditorJSField` in your models as you would any other Django model field. It stores the editor's content as JSON.
 
+- **To use a custom set of Editor.js tools for a field**, pass a `tools` dictionary to the field.
+- **To use the global (default) tool configuration**, define the field without the `tools` argument.
+
+Since EditorJSField inherits from Django's models.JSONField, you can also pass any of its standard attributes, such as `blank=True` or `null=True`.
+
+Example:
 ```python
 # my_app/models.py
 from django.db import models
@@ -101,6 +107,20 @@ from editor_js.fields import EditorJSField
 
 class Post(models.Model):
     title = models.CharField(max_length=200)
+
+    # This field will only have Header and List tools
+    summary = EditorJSField(tools={
+        'header': {
+            'class': 'Header',
+            'script': 'https://cdn.jsdelivr.net/npm/@editorjs/header@latest',
+        },
+        'list': {
+            'class': 'EditorjsList',
+            'script': 'https://cdn.jsdelivr.net/npm/@editorjs/list@latest',
+        }
+    })
+
+    # This field will use the default or global tool configuration
     body = EditorJSField()
     # ...
 ```
@@ -130,6 +150,32 @@ The library includes a built-in template filter to easily render your `EditorJSF
     ```
 
 The filter will automatically use your custom renderer class if you have specified one in your settings.
+
+---
+
+## Demo Application
+
+A fully functional demo application is included to showcase the features of this library. To try it out:
+
+**1. Clone the repository:**
+```bash
+git clone https://github.com/otto-torino/django-editor-js.git
+cd django-editor-js
+```
+
+**2. Run the demo:**
+
+- **On Windows:**
+    ```cmd
+    run_demo.bat
+    ```
+
+- **On macOS / Linux:**
+    ```bash
+    ./run_demo.sh
+    ```
+
+This will set up a minimal Django project, create a database, and start the development server so you can explore the editor in action.
 
 ---
 

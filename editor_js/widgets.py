@@ -8,11 +8,15 @@ class EditorJsIframeWidget(forms.Widget):
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         
-        config = attrs.pop('config', {})
-        context['widget']['config_json'] = json.dumps(config)        
+        config = context['widget']['attrs'].pop('config', {})
+
+        context['widget']['config_json'] = json.dumps(config)
         context['widget']['iframe_src'] = reverse('editor_js_iframe')
         return context
 
     class Media:
         # iframe resizer
-        js = ('https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.9/iframeResizer.min.js',)
+        js = (
+            # iframe resizer
+            'https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.9/iframeResizer.min.js',
+        )

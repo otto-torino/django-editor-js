@@ -18,31 +18,34 @@
      * @param {HTMLElement} wrapper - The widget's container element.
      */
     function _initializeInstance(wrapper) {
-        const widgetName = wrapper.dataset.widgetName;
-        
-        // Find DOM elements specific to this instance
-        const iframe = document.getElementById(`id_${widgetName}_iframe`);
-        const hiddenTextarea = document.getElementById(`id_${widgetName}`);
-        const fullscreenBtn = document.getElementById(`id_${widgetName}_fullscreen_btn`);
-        
-        if (!iframe || !hiddenTextarea || !fullscreenBtn) {
-            console.error(`[DjangoEditorJSWidget] Elements not found for widget: ${widgetName}. Initialization skipped.`);
+        if (!wrapper || wrapper.dataset.initialized === 'true') {
             return;
         }
 
-        const editorConfig = JSON.parse(wrapper.dataset.configJson);
+        const widgetName = wrapper.dataset.widgetName;
+        
+        const iframe = wrapper.querySelector(`#id_${widgetName}_iframe`);
+        const hiddenTextarea = wrapper.querySelector(`#id_${widgetName}`);
+        const fullscreenBtn = wrapper.querySelector(`#id_${widgetName}_fullscreen_btn`);
+
+        if (!iframe || !hiddenTextarea || !fullscreenBtn) {
+            console.error(`[DjangoEditorJSWidget] Core elements not found for widget: ${widgetName}. Please check template structure.`);
+            return;
+        }
+
+        const configJsonString = wrapper.dataset.configJson || '{}';
+        const editorConfig = JSON.parse(configJsonString);
+        
         const initialData = hiddenTextarea.value ? JSON.parse(hiddenTextarea.value) : {};
         const iframeOrigin = new URL(iframe.src).origin;
 
         _setupFullscreen(wrapper, fullscreenBtn);
         _setupMessageListener(iframe, hiddenTextarea, iframeOrigin);
 
-        // Initialize iFrameResize if the library is available
         if (typeof window.iFrameResize === 'function') {
             window.iFrameResize({ log: false, checkOrigin: false }, iframe);
         }
 
-        // Send configuration data to the iframe once it has loaded
         iframe.onload = function () {
             iframe.contentWindow.postMessage({
                 type: 'init',
@@ -50,6 +53,8 @@
                 initialData: initialData
             }, iframeOrigin);
         };
+
+        wrapper.dataset.initialized = 'true';
     }
 
     /**
@@ -61,7 +66,6 @@
         fullscreenBtn.addEventListener('click', function() {
             if (!document.fullscreenElement) {
                 wrapper.requestFullscreen().catch(err => {
-                    // Use console.error instead of alert for a better user experience
                     console.error(`[DjangoEditorJSWidget] Error enabling fullscreen mode: ${err.message}`);
                 });
             } else {
@@ -70,7 +74,6 @@
         });
 
         document.addEventListener('fullscreenchange', function() {
-            // Hide the button only when the wrapper is in fullscreen
             fullscreenBtn.style.display = (document.fullscreenElement === wrapper) ? 'none' : 'block';
         });
     }
@@ -83,12 +86,10 @@
      */
     function _setupMessageListener(iframe, hiddenTextarea, iframeOrigin) {
         window.addEventListener('message', function (event) {
-            // Security check: accept messages only from the trusted origin
             if (event.origin !== iframeOrigin) {
                 return;
             }
 
-            // Ensure the message comes from the correct iframe window
             if (event.source === iframe.contentWindow && event.data.type === 'editor-data-update') {
                 hiddenTextarea.value = JSON.stringify(event.data.content);
             }
@@ -98,19 +99,24 @@
     // --- Public API ---
 
     /**
-     * Initializes all EditorJS widgets present on the page.
-     * Searches for elements matching the provided selector and initializes them.
-     * @param {string} [selector='[data-widget-name]'] - A CSS selector to find widget containers.
+     * Initializes all widgets on the page and sets up a listener for dynamically
+     * added ones using Django's `formset:added` event.
+     * @param {string} selector - The CSS selector for the widget wrappers.
      */
     DjangoEditorJSWidget.init = function(selector) {
-        const widgetSelector = selector || '[data-widget-name]';
-        const widgetWrappers = document.querySelectorAll(widgetSelector);
-        
-        if (widgetWrappers.length === 0) {
-            console.warn(`[DjangoEditorJSWidget] No widgets found with selector: ${widgetSelector}`);
+        document.querySelectorAll(selector).forEach(_initializeInstance);
+
+        if (window.django && window.django.jQuery) {
+            const $ = window.django.jQuery;
+            $(document).on('formset:added', function(event, $row, formsetName) {
+                if ($row && typeof $row.find === 'function') {
+                    const $widgetWrapper = $row.find(selector);
+                    if ($widgetWrapper.length) {
+                        _initializeInstance($widgetWrapper[0]);
+                    }
+                }
+            });
         }
-        
-        widgetWrappers.forEach(_initializeInstance);
     };
 
     // --- Global Exposure ---
