@@ -41,13 +41,11 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../usage.html">In Your Models</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../usage.html#rendering-content-in-templates">Rendering Content in Templates</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../api_reference.html">Fields</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../api_reference.html#module-editor_js.widgets">Widgets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../api_reference.html#module-editor_js.renderers">Renderers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../api_reference.html#module-editor_js.templatetags.editor_js_filters">Template Filters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../api_reference.html#module-editor_js.utils">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demo.html">Demo Application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_reference.html">API Reference</a></li>
 </ul>
 
         </div>
@@ -242,8 +240,8 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">render_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
         <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="s2">&quot;#&quot;</span><span class="p">))</span>
-        <span class="n">css_class</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;css&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;btnColor&quot;</span><span class="p">,</span> <span class="s2">&quot;btn-secondary&quot;</span><span class="p">)</span>
-        <span class="n">alignment</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;alignment&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">)</span>
+        <span class="n">css_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;btnColor&quot;</span><span class="p">,</span> <span class="s2">&quot;btn-secondary&quot;</span><span class="p">))</span>
+        <span class="n">alignment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;alignment&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">))</span>
 
         <span class="n">button_html</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;a href=&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s1">&quot; class=&quot;btn </span><span class="si">{</span><span class="n">css_class</span><span class="si">}</span><span class="s1">&quot;&gt;</span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s1">&lt;/a&gt;&#39;</span>
 

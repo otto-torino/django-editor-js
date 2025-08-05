@@ -10,8 +10,8 @@ You can customize the library by adding an ``EDITOR_JS`` dictionary to your ``se
         # Define a custom storage backend for uploaded images.
         "STORAGE_BACKEND": "app.storage.PrivateMediaStorage",
 
-        # Specify a custom CSS file to be loaded inside the editor's iframe.
-        "CSS_FILE": "my_app/css/editor_styles.css",
+        # Specify the custom CSS files to be loaded inside the editor's iframe.
+        "CSS_FILES": ["my_app/css/style.css", "other_app/css/style.css"],
         
         # Specify a custom Python class to render the JSON data to HTML.
         "RENDERER_CLASS": "my_app.renderers.MyCustomRenderer",

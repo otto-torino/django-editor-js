@@ -1,5 +1,3 @@
-.. django-editor-js documentation master file
-
 Welcome to django-editor-js's documentation!
 ============================================
 
@@ -14,6 +12,7 @@ This documentation will guide you through installation, configuration, and advan
    installation
    usage
    configuration
+   demo
    api_reference
 
 Indices and tables

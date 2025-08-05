@@ -19,7 +19,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Configuration" href="configuration.html" /> 
+    <link rel="prev" title="Demo Application" href="demo.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -46,6 +46,7 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo.html">Demo Application</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-editor_js.fields">Fields</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#editor_js.fields.EditorJSField"><code class="docutils literal notranslate"><span class="pre">EditorJSField</span></code></a><ul>
@@ -88,15 +89,11 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-editor_js.templatetags.editor_js_filters">Template Filters</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#editor_js.templatetags.editor_js_filters.editor_js"><code class="docutils literal notranslate"><span class="pre">editorjs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#editor_js.templatetags.editor_js_filters.editor_js"><code class="docutils literal notranslate"><span class="pre">editor_js()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#editor_js.templatetags.editor_js_filters.get_renderer_class"><code class="docutils literal notranslate"><span class="pre">get_renderer_class()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#module-editor_js.utils">Utilities</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#editor_js.utils.get_editor_js_config"><code class="docutils literal notranslate"><span class="pre">get_editor_js_config()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#editor_js.utils.get_editor_js_storage"><code class="docutils literal notranslate"><span class="pre">get_editor_js_storage()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#utilities">Utilities</a></li>
 </ul>
 </li>
 </ul>
@@ -188,7 +185,7 @@ the instance is saved.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="editor_js.widgets.EditorJsIframeWidget.template_name">
-<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'editor_js/admin/widgets/editorjs_widget.html'</span></em><a class="headerlink" href="#editor_js.widgets.EditorJsIframeWidget.template_name" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'editor_js/admin/widgets/editor_js_widget.html'</span></em><a class="headerlink" href="#editor_js.widgets.EditorJsIframeWidget.template_name" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -281,8 +278,8 @@ the instance is saved.</p>
 <section id="module-editor_js.templatetags.editor_js_filters">
 <span id="template-filters"></span><h2>Template Filters<a class="headerlink" href="#module-editor_js.templatetags.editor_js_filters" title="Link to this heading"></a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="editor_js.templatetags.editor_js_filters.editorjs">
-<span class="sig-prename descclassname"><span class="pre">editor_js.templatetags.editor_js_filters.</span></span><span class="sig-name descname"><span class="pre">editorjs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/templatetags/editor_js_filters.html#editorjs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.templatetags.editor_js_filters.editorjs" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="editor_js.templatetags.editor_js_filters.editor_js">
+<span class="sig-prename descclassname"><span class="pre">editor_js.templatetags.editor_js_filters.</span></span><span class="sig-name descname"><span class="pre">editor_js</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/templatetags/editor_js_filters.html#editor_js"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.templatetags.editor_js_filters.editor_js" title="Link to this definition"></a></dt>
 <dd><p>Filter that renders the Editor.js JSON using the class specified
 in the settings or the default class.</p>
 </dd></dl>
@@ -295,23 +292,8 @@ otherwise returns our default class.</p>
 </dd></dl>
 
 </section>
-<section id="module-editor_js.utils">
-<span id="utilities"></span><h2>Utilities<a class="headerlink" href="#module-editor_js.utils" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="editor_js.utils.get_editorjs_config">
-<span class="sig-prename descclassname"><span class="pre">editor_js.utils.</span></span><span class="sig-name descname"><span class="pre">get_editorjs_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/utils.html#get_editorjs_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.utils.get_editorjs_config" title="Link to this definition"></a></dt>
-<dd><p>Returns the final configuration for Editor.js, merging the library defaults
-with the user’s custom settings.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="editor_js.utils.get_editorjs_storage">
-<span class="sig-prename descclassname"><span class="pre">editor_js.utils.</span></span><span class="sig-name descname"><span class="pre">get_editorjs_storage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/editor_js/utils.html#get_editorjs_storage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#editor_js.utils.get_editorjs_storage" title="Link to this definition"></a></dt>
-<dd><p>Helper function to get the storage class.
-Uses the class specified in settings.EDITOR_JS,
-otherwise falls back to default_storage.</p>
-</dd></dl>
-
+<section id="utilities">
+<h2>Utilities<a class="headerlink" href="#utilities" title="Link to this heading"></a></h2>
 </section>
 </section>
 
@@ -319,7 +301,7 @@ otherwise falls back to default_storage.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="configuration.html" class="btn btn-neutral float-left" title="Configuration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="demo.html" class="btn btn-neutral float-left" title="Demo Application" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

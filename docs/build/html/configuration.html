@@ -19,7 +19,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="API Reference" href="api_reference.html" />
+    <link rel="next" title="Demo Application" href="demo.html" />
     <link rel="prev" title="Usage Guide" href="usage.html" /> 
 </head>
 
@@ -47,6 +47,7 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Guide</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo.html">Demo Application</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api_reference.html">API Reference</a></li>
 </ul>
 
@@ -82,8 +83,8 @@
     <span class="c1"># Define a custom storage backend for uploaded images.</span>
     <span class="s2">&quot;STORAGE_BACKEND&quot;</span><span class="p">:</span> <span class="s2">&quot;app.storage.PrivateMediaStorage&quot;</span><span class="p">,</span>
 
-    <span class="c1"># Specify a custom CSS file to be loaded inside the editor&#39;s iframe.</span>
-    <span class="s2">&quot;CSS_FILE&quot;</span><span class="p">:</span> <span class="s2">&quot;my_app/css/editor_styles.css&quot;</span><span class="p">,</span>
+    <span class="c1"># Specify the custom CSS files to be loaded inside the editor&#39;s iframe.</span>
+    <span class="s2">&quot;CSS_FILES&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;my_app/css/style.css&quot;</span><span class="p">,</span> <span class="s2">&quot;other_app/css/style.css&quot;</span><span class="p">],</span>
 
     <span class="c1"># Specify a custom Python class to render the JSON data to HTML.</span>
     <span class="s2">&quot;RENDERER_CLASS&quot;</span><span class="p">:</span> <span class="s2">&quot;my_app.renderers.MyCustomRenderer&quot;</span><span class="p">,</span>
@@ -112,7 +113,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="usage.html" class="btn btn-neutral float-left" title="Usage Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="api_reference.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="demo.html" class="btn btn-neutral float-right" title="Demo Application" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

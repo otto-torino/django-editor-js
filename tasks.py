@@ -84,7 +84,7 @@ def release(c, bumpsize=''):
 
     import editor_js
     c.run("python -m build")
-    # c.run("twine upload dist/*")
+    c.run("twine upload dist/*")
 
     c.run('git tag -a {version} -m "New version: {version}"'.format(version=editor_js.__version__))
     c.run("git push --tags")

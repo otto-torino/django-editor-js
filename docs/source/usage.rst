@@ -4,7 +4,14 @@ Usage Guide
 In Your Models
 --------------
 
-Use the ``EditorJSField`` in your models just like any other field. It stores the editor's output as JSON.
+Use the ``EditorJSField`` in your models as you would any other Django model field. It stores the editor's content as JSON.
+
+- **To use a custom set of Editor.js tools for a field**, pass a ``tools`` dictionary to the field.
+- **To use the global (default) tool configuration**, define the field without the ``tools`` argument.
+
+Since ``EditorJSField`` inherits from Django's ``models.JSONField``, you can also pass any of its standard attributes, such as ``blank=True`` or ``null=True``.
+
+Example:
 
 .. code-block:: python
 
@@ -14,6 +21,20 @@ Use the ``EditorJSField`` in your models just like any other field. It stores th
 
     class Post(models.Model):
         title = models.CharField(max_length=200)
+        
+        # This field will only have Header and List tools
+        summary = EditorJSField(tools={
+            'header': {
+                'class': 'Header',
+                'script': 'https://cdn.jsdelivr.net/npm/@editorjs/header@latest',
+            },
+            'list': {
+                'class': 'EditorjsList',
+                'script': 'https://cdn.jsdelivr.net/npm/@editorjs/list@latest',
+            }
+        })
+
+        # This field will use the default or global tool configuration
         body = EditorJSField()
 
 The field will automatically render the iframe widget in the Django admin.

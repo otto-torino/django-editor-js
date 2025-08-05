@@ -1,6 +1,6 @@
 # Django Editor.js
 
-[![PyPI version](https://badge.fury.io/py/django-editor-js.svg)](https://badge.fury.io/py/django-editor-js)
+[![PyPI version](https://badge.fury.io/py/dj-editor-js.svg)](https://badge.fury.io/py/dj-editor-js)
 [![Build Status](https://github.com/otto-torino/django-editor-js/actions/workflows/ci.yml/badge.svg)](https://github.com/otto-torino/django-editor-js/actions/workflows/ci.yml)
 [![Coverage Status](https://codecov.io/gh/otto-torino/django-editor-js/graph/badge.svg)](https://codecov.io/gh/otto-torino/django-editor-js)
 
@@ -64,7 +64,7 @@ This library provides a custom `EditorJSField` for your models and a sandboxed i
         # Define a custom storage backend for uploaded images.
         "STORAGE_BACKEND": "app.storage.PrivateMediaStorage",
     
-        # Specify a custom CSS files to be loaded inside the editor's iframe.
+        # Specify the custom CSS files to be loaded inside the editor's iframe.
         "CSS_FILES": ["my_app/css/style.css", "other_app/css/style.css"],
     
         # Specify a custom Python class to render the JSON data to HTML.
