@@ -1,6 +1,0 @@
-dist
-docs
-editor_js
-example
-tests
-venv
