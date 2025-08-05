@@ -1,5 +1,5 @@
 @echo off
-echo --- Starting Demo Setup for django-editor-js ---
+echo --- Starting Demo Setup for dj-editor-js ---
 
 IF NOT EXIST venv (
     echo Creating virtual environment...

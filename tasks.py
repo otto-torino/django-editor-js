@@ -48,7 +48,7 @@ def docs(c):
     """
     Build the documentation and open it in the browser
     """
-    c.run("rm -f docs/django-editor-js.rst")
+    c.run("rm -f docs/dj-editor-js.rst")
     c.run("rm -f docs/modules.rst")
     c.run("sphinx-apidoc -o docs/ editor_js")
 

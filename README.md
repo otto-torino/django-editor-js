@@ -24,7 +24,7 @@ This library provides a custom `EditorJSField` for your models and a sandboxed i
 
 1.  Install the package from PyPI:
     ```bash
-    pip install django-editor-js
+    pip install dj-editor-js
     ```
 
 2.  Add `'editor_js'` to your `INSTALLED_APPS` in `settings.py`:

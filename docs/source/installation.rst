@@ -5,7 +5,7 @@ Installation
 
 .. code-block:: bash
 
-   pip install django-editor-js
+   pip install dj-editor-js
 
 2. Add ``editor_js`` to your ``INSTALLED_APPS`` in ``settings.py``:
 
@@ -26,6 +26,6 @@ Installation
 
     urlpatterns = [
         path('admin/', admin.site.urls),
-        path('editorjs/', include('editor_js.urls')),
+        path('editor-js/', include('editor_js.urls')),
         # ... your other urls
     ]

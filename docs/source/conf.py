@@ -27,7 +27,7 @@ django.setup()
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'django-editor-js'
+project = 'dj-editor-js'
 copyright = '2025, Otto'
 author = 'Otto'
 release = '0.1.0'

@@ -1,4 +1,4 @@
-Welcome to django-editor-js's documentation!
+Welcome to dj-editor-js's documentation!
 ============================================
 
 **A modern, extensible, and self-contained Django app for integrating the block-style Editor.js into your projects.**

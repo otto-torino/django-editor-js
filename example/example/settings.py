@@ -117,7 +117,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# --- django-editor-js Configuration ---
+# --- dj-editor-js Configuration ---
 # This section is optional. If you omit it, the library will use its
 # default tools and settings.
 # You can uncomment and modify it for customization.
