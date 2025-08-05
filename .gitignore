@@ -16,6 +16,11 @@ db.sqlite3-journal
 /media/
 /staticfiles/
 
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
 # IDE and editor configuration
 .idea/
 .vscode/

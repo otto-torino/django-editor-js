@@ -1,0 +1,12 @@
+[run]
+branch = true
+
+[report]
+omit =
+    *tests*
+    *example*
+    *migrations*
+show_missing = True
+exclude_lines =
+    raise NotImplementedError
+    pragma: no cover

@@ -35,4 +35,4 @@ dependencies = [
 include-package-data = true
 
 [tool.setuptools.packages.find]
-exclude = ["example", "example.*", "tests", "tests.*", "docs", "docs.*", "run_demo.sh", "run_demo.bat"] 
+exclude = ["example", "example.*", "tests", "tests.*", "docs", "docs.*", "run_demo.sh", "run_demo.bat", ".readthedocs.yaml", ".gitignore"] 

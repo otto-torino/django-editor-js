@@ -1,7 +1,8 @@
 # Django Editor.js
 
-<!-- [![PyPI version](https://badge.fury.io/py/django-editor-js.svg)](https://badge.fury.io/py/django-editor-js)
-[![Build Status](https://img.shields.io/travis/otto-torino/django-editor-js.svg?branch=main)](https://travis-ci.org/otto-torino/django-editor-js) -->
+[![PyPI version](https://badge.fury.io/py/django-editor-js.svg)](https://badge.fury.io/py/django-editor-js)
+[![Build Status](https://github.com/otto-torino/django-editor-js/actions/workflows/ci.yml/badge.svg)](https://github.com/otto-torino/django-editor-js/actions/workflows/ci.yml)
+[![Coverage Status](https://codecov.io/gh/otto-torino/django-editor-js/graph/badge.svg)](https://codecov.io/gh/otto-torino/django-editor-js)
 
 A modern, extensible, and self-contained Django app for integrating the block-style [Editor.js](https://editorjs.io/) into your projects.
 
