@@ -1,11 +1,13 @@
 [run]
 branch = true
+source = editor_js
+omit =
+    */tests/*
+    */example/*
+    */migrations/*
+    tasks.py
 
 [report]
-omit =
-    *tests*
-    *example*
-    *migrations*
 show_missing = True
 exclude_lines =
     raise NotImplementedError

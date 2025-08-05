@@ -29,7 +29,7 @@ jobs:
 
     - name: Run Tests and Generate Coverage Report
       run: |
-        coverage run --source='.' tests/runtests.py
+        coverage run tests/runtests.py
         coverage xml
 
     - name: Upload coverage reports to Codecov
