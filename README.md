@@ -239,7 +239,7 @@ EDITOR_JS = {
 ### Custom Storage & Styling
 
 -   **Storage**: To use a different storage system (like Amazon S3), set the `STORAGE_BACKEND` setting to the dotted path of your storage class (e.g., `'storages.backends.s3boto3.S3Boto3Storage'`).
--   **Styling**: To match the editor's appearance with your frontend, provide a path to a custom CSS file in the `CSS_FILE` setting. This file will be loaded inside the editor's iframe.
+-   **Styling**: To match the editor's appearance with your frontend, provide a list of paths to your custom CSS files in the `CSS_FILES` setting. These files will be loaded in the specified order inside the editor's iframe.
 
 ## License
 
