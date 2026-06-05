@@ -135,6 +135,51 @@
         return names.indexOf(name) !== -1;
     }
 
+    // --- Non-text block preservation (in-place correction) -----------------
+
+    // Blocks that carry translatable/correctable prose and are part of the
+    // HTML round-trip. Everything else (image, table, embed, button, divider,
+    // raw, ...) is "media": it is never sent to the AI and must survive a
+    // read -> AI -> write cycle on the SAME field.
+    const TEXT_BLOCK_TYPES = ['paragraph', 'header', 'list', 'quote', 'code'];
+    function isTextBlock(block) {
+        return block && TEXT_BLOCK_TYPES.indexOf(block.type) !== -1;
+    }
+
+    // Per-field snapshot of the blocks last read via getValue(). Used to
+    // re-insert media blocks when the AI result is written back to the same
+    // field (i.e. in-place correction). Translation/summarization target
+    // different/empty fields, so no snapshot exists for them and the document
+    // is simply replaced by the produced text blocks.
+    const _snapshots = {};
+
+    function hasMedia(blocks) {
+        return !!(blocks && blocks.some(function (b) { return !isTextBlock(b); }));
+    }
+
+    // Rebuild the document by walking the original blocks: media blocks are kept
+    // verbatim at their position; each text slot is filled, in order, with the
+    // next AI-produced text block. Extra produced blocks (AI added content) are
+    // appended; missing ones (AI merged content) just leave fewer text blocks.
+    function mergePreservingMedia(originalBlocks, newTextBlocks) {
+        const result = [];
+        let i = 0;
+        originalBlocks.forEach(function (b) {
+            if (isTextBlock(b)) {
+                if (i < newTextBlocks.length) {
+                    result.push(newTextBlocks[i]);
+                    i++;
+                }
+            } else {
+                result.push(b);
+            }
+        });
+        for (; i < newTextBlocks.length; i++) {
+            result.push(newTextBlocks[i]);
+        }
+        return { blocks: result.length ? result : newTextBlocks };
+    }
+
     // --- The Baton AI adapter ----------------------------------------------
 
     const EditorJsBatonAdapter = {
@@ -149,12 +194,22 @@
         getValue: function (fieldId) {
             if (!isEditorJsField(fieldId)) return undefined;
             const data = window.DjangoEditorJSWidget.getData(fieldIdToName(fieldId));
+            // snapshot for in-place correction (preserve media on write-back)
+            _snapshots[fieldId] = data && data.blocks ? data.blocks : null;
             return blocksToHtml(data);
         },
 
         setValue: function (fieldId, value) {
             if (!isEditorJsField(fieldId)) return false;
-            return window.DjangoEditorJSWidget.setData(fieldIdToName(fieldId), htmlToBlocks(value));
+            const produced = htmlToBlocks(value);
+            const snapshot = _snapshots[fieldId];
+            // in-place write on a field that contained media -> preserve it
+            const finalDoc =
+                snapshot && hasMedia(snapshot)
+                    ? mergePreservingMedia(snapshot, produced.blocks)
+                    : produced;
+            delete _snapshots[fieldId];
+            return window.DjangoEditorJSWidget.setData(fieldIdToName(fieldId), finalDoc);
         },
 
         setCorrect: function (fieldId, icon) {
@@ -196,7 +251,8 @@
     window.DjangoEditorJSBatonAdapter = {
         adapter: EditorJsBatonAdapter,
         blocksToHtml: blocksToHtml,
-        htmlToBlocks: htmlToBlocks
+        htmlToBlocks: htmlToBlocks,
+        mergePreservingMedia: mergePreservingMedia
     };
 
 })(window, document);
