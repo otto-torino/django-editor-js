@@ -8,6 +8,13 @@ class EditorJsIframeWidget(forms.Widget):
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
 
+        # An empty JSONField is prepared as the literal string "null"
+        # (json.dumps(None)). Render an empty textarea instead, so a visually
+        # empty editor maps to an empty value rather than a non-empty "null"
+        # wrapper. The widget JS already treats an empty value as an empty doc.
+        if context['widget']['value'] in (None, 'null', 'None'):
+            context['widget']['value'] = ''
+
         config = context['widget']['attrs'].pop('config', {})
 
         context['widget']['config_json'] = json.dumps(config)
