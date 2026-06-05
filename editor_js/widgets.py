@@ -7,7 +7,7 @@ class EditorJsIframeWidget(forms.Widget):
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
-        
+
         config = context['widget']['attrs'].pop('config', {})
 
         context['widget']['config_json'] = json.dumps(config)
@@ -15,8 +15,11 @@ class EditorJsIframeWidget(forms.Widget):
         return context
 
     class Media:
-        # iframe resizer
         js = (
             # iframe resizer
             'https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.9/iframeResizer.min.js',
+            # Django Baton AI bridge: registers an editor adapter on Baton.AI so
+            # translation/summarization/correction work on Editor.js fields.
+            # No-op (and silent) when django-baton is not installed.
+            'editor_js/js/baton_adapter.js',
         )
