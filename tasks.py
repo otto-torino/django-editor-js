@@ -71,22 +71,3 @@ def unittest(c):
     Run unittests
     """
     c.run("python manage.py test")
-
-
-@task(help={'bumpsize': 'Bump either for a "feature" or "breaking" change'})
-def release(c, bumpsize=''):
-    """
-    Package and upload a release
-    """
-    clean(c)
-    if bumpsize:
-        bumpsize = '--' + bumpsize
-
-    from importlib.metadata import version
-    c.run("python -m build")
-    c.run("twine upload dist/*")
-
-    pkg_version = version("dj-editor-js")
-    c.run('git tag -a {version} -m "New version: {version}"'.format(version=pkg_version))
-    c.run("git push --tags")
-    c.run("git push origin main")
