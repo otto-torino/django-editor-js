@@ -43,6 +43,30 @@ class WidgetTest(TestCase):
 
         self.assertEqual(context['widget']['iframe_src'], reverse('editor_js_iframe'))
 
+    def test_get_context_normalizes_empty_values(self):
+        """
+        An empty JSONField is prepared as None or the literal string "null".
+        get_context should normalize these to an empty string so a visually
+        empty editor maps to an empty value rather than a "null" wrapper.
+        """
+        widget = EditorJsIframeWidget()
+
+        for empty_value in (None, 'null', 'None'):
+            context = widget.get_context(name='content', value=empty_value, attrs=None)
+            self.assertEqual(
+                context['widget']['value'], '',
+                msg=f'value {empty_value!r} should be normalized to an empty string',
+            )
+
+    def test_get_context_preserves_non_empty_value(self):
+        """
+        A real document value must be passed through unchanged.
+        """
+        widget = EditorJsIframeWidget()
+        value = '{"blocks": []}'
+        context = widget.get_context(name='content', value=value, attrs=None)
+        self.assertEqual(context['widget']['value'], value)
+
     def test_media_assets(self):
         """
         Checks that the Media class correctly defines JavaScript assets.
@@ -54,3 +78,4 @@ class WidgetTest(TestCase):
             'https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.9/iframeResizer.min.js',
             media._js
         )
+        self.assertIn('editor_js/js/baton_adapter.js', media._js)
