@@ -82,10 +82,11 @@ def release(c, bumpsize=''):
     if bumpsize:
         bumpsize = '--' + bumpsize
 
-    import editor_js
+    from importlib.metadata import version
     c.run("python -m build")
     c.run("twine upload dist/*")
 
-    c.run('git tag -a {version} -m "New version: {version}"'.format(version=editor_js.__version__))
+    pkg_version = version("dj-editor-js")
+    c.run('git tag -a {version} -m "New version: {version}"'.format(version=pkg_version))
     c.run("git push --tags")
-    c.run("git push origin master")
+    c.run("git push origin main")
