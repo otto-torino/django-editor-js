@@ -124,6 +124,8 @@
                 }, 250);
             }
         });
+
+        console.log('[DEBUG] 8. Editor.js instance created:', _editorInstance);
     }
 
     /**
@@ -136,8 +138,27 @@
             if (event.data.type === 'init') {
                 console.log('[DEBUG] 2. Received "init" message from parent:', event.data);
                 const fieldConfig = event.data.config || {};
-                
+
                 _createEditor(event.data.initialData, fieldConfig);
+            }
+
+            // Programmatic content replacement (e.g. Baton AI translation/summary).
+            // Re-renders the editor with the given blocks and re-syncs the parent.
+            if (event.data.type === 'set-data' && _editorInstance) {
+                _editorInstance.render(event.data.content || { blocks: [] })
+                    .then(function () {
+                        return _editorInstance.save();
+                    })
+                    .then(function (outputData) {
+                        window.parent.postMessage({
+                            type: 'editor-data-update',
+                            content: outputData
+                        }, _config.trustedOrigin);
+                        if (window.parentIFrame) window.parentIFrame.size();
+                    })
+                    .catch(function (error) {
+                        console.error('[DjangoEditorJSIframe] set-data failed: ', error);
+                    });
             }
         });
     }

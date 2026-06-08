@@ -17,6 +17,7 @@ This library provides a custom `EditorJSField` for your models and a sandboxed i
 -   **Built-in Template Filter**: Render your content with a simple `{% load ... %}` and filter call, no need to write your own rendering logic.
 -   **Sensible Defaults**: Works out-of-the-box with a rich set of common Editor.js tools.
 -   **Admin-Friendly UI**: Features include automatic iframe resizing and a fullscreen editing mode for a better user experience.
+-   **Baton AI ready**: Zero-config integration with [django-baton](https://github.com/otto-torino/django-baton)'s AI features — translation, summarization and correction work on Editor.js fields (see [Baton AI Integration](#baton-ai-integration)).
 
 ---
 
@@ -240,6 +241,46 @@ EDITOR_JS = {
 
 -   **Storage**: To use a different storage system (like Amazon S3), set the `STORAGE_BACKEND` setting to the dotted path of your storage class (e.g., `'storages.backends.s3boto3.S3Boto3Storage'`).
 -   **Styling**: To match the editor's appearance with your frontend, provide a list of paths to your custom CSS files in the `CSS_FILES` setting. These files will be loaded in the specified order inside the editor's iframe.
+
+## Baton AI Integration
+
+If you use [`django-baton`](https://github.com/otto-torino/django-baton) (>= 5.2) as your admin theme, this library integrates with **Baton AI out of the box — no configuration required**. Translation, summarization and correction work on your `EditorJSField`s, alongside CKEditor and native fields on the same form.
+
+### How it works
+
+The widget ships a small adapter (`editor_js/js/baton_adapter.js`) that is loaded automatically via the widget's `Media` and **self-registers** on `Baton.AI`. It bridges the two data models:
+
+-   **Reading** — Editor.js block JSON is converted to HTML so the AI receives clean prose.
+-   **Writing** — the AI's HTML result is converted back into Editor.js blocks and re-rendered inside the iframe editor.
+
+When Baton is not installed the adapter is a silent no-op, so it is always safe to ship.
+
+### Setup
+
+Install both apps and configure your Baton AI credentials (see Baton's docs for obtaining them):
+
+```python
+# settings.py
+INSTALLED_APPS = [
+    "baton",
+    "editor_js",
+    # ...
+    "baton.autodiscover",
+]
+
+BATON = {
+    "BATON_CLIENT_ID": os.getenv("BATON_CLIENT_ID"),
+    "BATON_CLIENT_SECRET": os.getenv("BATON_CLIENT_SECRET"),
+    "AI": {
+        "ENABLE_TRANSLATIONS": True,
+        "ENABLE_CORRECTIONS": True,
+    },
+}
+```
+
+Then use an `EditorJSField` as usual. For **translation**, make it translatable with `django-modeltranslation`; for **summarization**, point Baton's `baton_summarize_fields` at it as a source and/or target. The AI buttons appear automatically.
+
+> **Note on non-text blocks.** Translation and summarization send only text-bearing blocks (paragraph, header, list, quote, code) to the AI. Media-like blocks (image, table, embed, button, divider) carry no translatable prose and are not part of the round-trip — keep this in mind when running in-place **correction** on a field that mixes prose and media, as the rewritten content is rebuilt from the text blocks.
 
 ## License
 

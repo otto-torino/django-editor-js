@@ -119,6 +119,55 @@
         }
     };
 
+    /**
+     * Returns the widget names of every editor instance on the page.
+     * @returns {string[]} Array of widget names (the `name` form attribute).
+     */
+    DjangoEditorJSWidget.getNames = function() {
+        return Array.prototype.map.call(
+            document.querySelectorAll('.editor-js-widget-wrapper'),
+            function(wrapper) { return wrapper.dataset.widgetName; }
+        ).filter(Boolean);
+    };
+
+    /**
+     * Returns the current Editor.js data (parsed JSON) for a widget, read from
+     * its hidden textarea (kept in sync by the iframe on every change).
+     * @param {string} widgetName - The widget's name.
+     * @returns {object|null} The `{blocks: [...]}` object, or null if not found.
+     */
+    DjangoEditorJSWidget.getData = function(widgetName) {
+        const textarea = document.getElementById(`id_${widgetName}`);
+        if (!textarea) return null;
+        try {
+            return textarea.value ? JSON.parse(textarea.value) : { blocks: [] };
+        } catch (e) {
+            console.error(`[DjangoEditorJSWidget] Invalid JSON in widget '${widgetName}':`, e);
+            return { blocks: [] };
+        }
+    };
+
+    /**
+     * Programmatically replaces a widget's content. Updates the hidden textarea
+     * immediately and asks the iframe editor to re-render the given blocks.
+     * @param {string} widgetName - The widget's name.
+     * @param {object} content - Editor.js data, e.g. `{blocks: [...]}`.
+     * @returns {boolean} true if the widget exists and the update was dispatched.
+     */
+    DjangoEditorJSWidget.setData = function(widgetName, content) {
+        const iframe = document.getElementById(`id_${widgetName}_iframe`);
+        const textarea = document.getElementById(`id_${widgetName}`);
+        if (!iframe || !textarea) {
+            return false;
+        }
+        textarea.value = JSON.stringify(content);
+        iframe.contentWindow.postMessage(
+            { type: 'set-data', content: content },
+            new URL(iframe.src).origin
+        );
+        return true;
+    };
+
     // --- Global Exposure ---
     window.DjangoEditorJSWidget = DjangoEditorJSWidget;
 

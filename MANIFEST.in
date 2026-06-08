@@ -1,4 +1,5 @@
 graft editor_js/templates
 graft editor_js/static
+graft editor_js/locale
 include LICENSE
 include README.md
