@@ -24,7 +24,7 @@ class EditorJsIframeWidget(forms.Widget):
     class Media:
         js = (
             # iframe resizer
-            'https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.9/iframeResizer.min.js',
+            'editor_js/js/vendor/iframe-resizer/iframeResizer.min.js',
             # Django Baton AI bridge: registers an editor adapter on Baton.AI so
             # translation/summarization/correction work on Editor.js fields.
             # No-op (and silent) when django-baton is not installed.

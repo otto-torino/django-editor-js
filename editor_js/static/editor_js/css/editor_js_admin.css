@@ -1,6 +1,4 @@
-@import 'https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap';
-@import 'https://fonts.googleapis.com/css2?family=Fira+Code:wght@400&display=swap';
-@import 'https://fonts.googleapis.com/css2?family=Lora:wght@400&display=swap';
+@import 'fonts.css';
 
 :root {
     --primary-color: #0d6efd;

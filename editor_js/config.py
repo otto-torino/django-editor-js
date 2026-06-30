@@ -5,37 +5,44 @@ from django.utils.module_loading import import_string
 DEFAULT_EDITOR_JS_TOOLS = {
     'header': {
         'class': 'Header',
-        'script': 'https://cdn.jsdelivr.net/npm/@editorjs/header@latest',
+        'script': 'editor_js/js/vendor/editorjs/header.min.js',
+        'static': True,
     },
     'list': {
         'class': 'EditorjsList',
-        'script': 'https://cdn.jsdelivr.net/npm/@editorjs/list@latest',
+        'script': 'editor_js/js/vendor/editorjs/list.min.js',
+        'static': True,
     },
     'quote': {
         'class': 'Quote',
-        'script': 'https://cdn.jsdelivr.net/npm/@editorjs/quote@latest',
+        'script': 'editor_js/js/vendor/editorjs/quote.min.js',
+        'static': True,
     },
     'table': {
         'class': 'Table',
-        'script': 'https://cdn.jsdelivr.net/npm/@editorjs/table@latest',
+        'script': 'editor_js/js/vendor/editorjs/table.min.js',
+        'static': True,
         'config': {
             'inlineToolbar': True,
         }
     },
     'raw': {
         'class': 'RawTool',
-        'script': 'https://cdn.jsdelivr.net/npm/@editorjs/raw@latest',
+        'script': 'editor_js/js/vendor/editorjs/raw.min.js',
+        'static': True,
     },
     'embed': {
         'class': 'Embed',
-        'script': 'https://cdn.jsdelivr.net/npm/@editorjs/embed@latest',
+        'script': 'editor_js/js/vendor/editorjs/embed.min.js',
+        'static': True,
         'config': {
             'inlineToolbar': True,
         }
     },
     'image': {
         'class': 'ImageTool',
-        'script': 'https://cdn.jsdelivr.net/npm/@editorjs/image@latest',
+        'script': 'editor_js/js/vendor/editorjs/image.min.js',
+        'static': True,
     },
     'button': {
         'class': 'ButtonTool',

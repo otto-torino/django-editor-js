@@ -11,11 +11,13 @@ class Post(models.Model):
         tools={
             'header': {
                 'class': 'Header',
-                'script': 'https://cdn.jsdelivr.net/npm/@editorjs/header@latest',
+                'script': 'editor_js/js/vendor/editorjs/header.min.js',
+                'static': True,
             },
             'list': {
                 'class': 'EditorjsList',
-                'script': 'https://cdn.jsdelivr.net/npm/@editorjs/list@latest',
+                'script': 'editor_js/js/vendor/editorjs/list.min.js',
+                'static': True,
             }
         }
     )

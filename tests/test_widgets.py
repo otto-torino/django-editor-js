@@ -75,7 +75,7 @@ class WidgetTest(TestCase):
         media = widget.media
 
         self.assertIn(
-            'https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.9/iframeResizer.min.js',
+            'editor_js/js/vendor/iframe-resizer/iframeResizer.min.js',
             media._js
         )
         self.assertIn('editor_js/js/baton_adapter.js', media._js)
