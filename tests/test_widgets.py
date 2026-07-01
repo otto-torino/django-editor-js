@@ -79,3 +79,16 @@ class WidgetTest(TestCase):
             media._js
         )
         self.assertIn('editor_js/js/baton_adapter.js', media._js)
+
+    def test_fullscreen_button_uses_themeable_styles(self):
+        """
+        The fullscreen button should follow admin theme colors instead of using
+        fixed inline colors, so dark mode can style the icon correctly.
+        """
+        widget = EditorJsIframeWidget()
+        html = widget.render(name='content', value='', attrs={})
+
+        self.assertIn('class="editor-js-fullscreen-button"', html)
+        self.assertIn('color: var(--body-fg, #333);', html)
+        self.assertIn('background-color: var(--darkened-bg, #f0f0f0);', html)
+        self.assertNotIn('background-color: #f0f0f0', html)

@@ -1,6 +1,7 @@
 # Django Editor.js
 
 [![PyPI version](https://badge.fury.io/py/dj-editor-js.svg)](https://badge.fury.io/py/dj-editor-js)
+[![Downloads](https://static.pepy.tech/badge/dj-editor-js)](https://pepy.tech/project/dj-editor-js)
 [![Build Status](https://github.com/otto-torino/django-editor-js/actions/workflows/ci.yml/badge.svg)](https://github.com/otto-torino/django-editor-js/actions/workflows/ci.yml)
 [![Coverage Status](https://codecov.io/gh/otto-torino/django-editor-js/graph/badge.svg)](https://codecov.io/gh/otto-torino/django-editor-js)
 

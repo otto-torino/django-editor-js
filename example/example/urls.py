@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    path('baton/', include('baton.urls')),
     path('admin/', admin.site.urls),
     path('editor-js/', include('editor_js.urls')),
 ]
