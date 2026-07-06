@@ -53,12 +53,18 @@
         const useOverride = toolsOverride && Object.keys(toolsOverride).length > 0;
         const activeToolsConfig = useOverride ? { ...toolsOverride } : _config.toolsConfig;
 
-        // The bundled link tool (with its "open in new tab" option) replaces
-        // the native Editor.js one everywhere, including field-specific
-        // overrides — unless the override addresses 'link' itself (e.g. sets
-        // it to null to restore the native tool).
-        if (useOverride && !('link' in toolsOverride) && _config.toolsConfig.link) {
-            activeToolsConfig.link = _config.toolsConfig.link;
+        // Bundled inline tools (link, marker, font size) are used everywhere,
+        // including field-specific overrides — unless the override addresses
+        // the tool itself (e.g. sets it to null to restore native behavior).
+        if (useOverride) {
+            for (const name in _config.toolsConfig) {
+                if (name in toolsOverride) continue;
+                const info = _config.toolsConfig[name];
+                const toolClass = info && window[info.class];
+                if (toolClass && toolClass.isInline) {
+                    activeToolsConfig[name] = info;
+                }
+            }
         }
         
         console.log(`[DEBUG] 5. Using ${useOverride ? 'specific' : 'default'} tools config:`, activeToolsConfig);

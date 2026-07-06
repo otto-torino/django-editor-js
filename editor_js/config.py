@@ -54,6 +54,18 @@ DEFAULT_EDITOR_JS_TOOLS = {
         'class': 'LinkWithTargetTool',
         'script': 'editor_js/js/plugins/link-tool.js',
         'static': True,
+    },
+    # Inline tool: highlights the selection with <mark class="cdx-marker">.
+    'marker': {
+        'class': 'MarkerTool',
+        'script': 'editor_js/js/plugins/marker-tool.js',
+        'static': True,
+    },
+    # Inline tool: preset font sizes applied via a styled <span>.
+    'fontSize': {
+        'class': 'FontSizeTool',
+        'script': 'editor_js/js/plugins/font-size-tool.js',
+        'static': True,
     }
 }
 

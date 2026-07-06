@@ -9,16 +9,24 @@ from django.utils.html import strip_tags
 class _InlineHTMLSanitizer(HTMLParser):
     """
     Allowlist sanitizer for the markup produced by the Editor.js inline
-    toolbar (bold, italic, links, ...). Disallowed tags are dropped while
-    their text content is kept; attribute values are escaped and unsafe
-    URL schemes are removed.
+    toolbar (bold, italic, links, highlight, font size, ...). Disallowed
+    tags are dropped while their text content is kept; attribute values are
+    escaped, validated against per-attribute rules (True = any value, or a
+    regex the value must match) and unsafe URL schemes are removed.
     """
 
+    CDX_CLASS_RE = re.compile(r'^cdx-[\w-]+( cdx-[\w-]+)*$')
+    FONT_SIZE_STYLE_RE = re.compile(
+        r'^font-size:\s*\d+(\.\d+)?(em|rem|px|%)\s*;?$', re.IGNORECASE
+    )
+
     ALLOWED_TAGS = {
-        'a': ('href', 'target', 'rel'),
-        'b': (), 'strong': (), 'i': (), 'em': (),
-        'u': (), 's': (), 'code': (), 'mark': (),
-        'sup': (), 'sub': (), 'br': (),
+        'a': {'href': True, 'target': True, 'rel': True},
+        'b': {}, 'strong': {}, 'i': {}, 'em': {},
+        'u': {}, 's': {}, 'code': {},
+        'mark': {'class': CDX_CLASS_RE},
+        'span': {'class': CDX_CLASS_RE, 'style': FONT_SIZE_STYLE_RE},
+        'sup': {}, 'sub': {}, 'br': {},
     }
     UNSAFE_URL_RE = re.compile(r'^\s*(javascript|data|vbscript):', re.IGNORECASE)
 
@@ -32,9 +40,12 @@ class _InlineHTMLSanitizer(HTMLParser):
             return
         rendered_attrs = ''
         for name, value in attrs:
-            if name not in allowed_attrs or value is None:
+            rule = allowed_attrs.get(name)
+            if rule is None or value is None:
                 continue
             if name == 'href' and self.UNSAFE_URL_RE.match(value):
+                continue
+            if rule is not True and not rule.match(value):
                 continue
             rendered_attrs += f' {name}="{html.escape(value)}"'
         self.parts.append(f'<{tag}{rendered_attrs}>')

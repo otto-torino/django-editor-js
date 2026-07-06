@@ -231,11 +231,15 @@ The Editor.js inline toolbar (bold, italic, link, ...) is **enabled by default f
 }
 ```
 
-### Links with "open in new tab"
+### Bundled inline tools
 
-The native Editor.js inline link tool is replaced by a bundled one (`link`) that adds an **"Open in new tab"** checkbox: when checked, the anchor is saved with `target="_blank"` and `rel="noopener noreferrer"`. Same icons and behavior as the native tool otherwise.
+Besides the native bold and italic, the library bundles three inline tools:
 
-It is used everywhere by default — including fields that define their own per-field `tools` — unless a configuration addresses the `'link'` key itself: set it to `None` (in `EDITOR_JS['TOOLS']` or in a per-field `tools` dict) to restore the native link tool, or override it with your own tool like any other.
+-   **`link`** — replaces the native Editor.js link tool, adding an **"Open in new tab"** checkbox: when checked, the anchor is saved with `target="_blank"` and `rel="noopener noreferrer"`. Same icons and behavior as the native tool otherwise.
+-   **`marker`** — highlights the selection, wrapping it in `<mark class="cdx-marker">`.
+-   **`fontSize`** — applies a preset size (Small, Normal, Large, Huge) to the selection via `<span class="cdx-font-size" style="font-size: ...">`.
+
+They are used everywhere by default — including fields that define their own per-field `tools` — unless a configuration addresses the tool's key itself: set `'link'`, `'marker'` or `'fontSize'` to `None` (in `EDITOR_JS['TOOLS']` or in a per-field `tools` dict) to remove it, or override it with your own tool like any other.
 
 ### Custom HTML Rendering
 

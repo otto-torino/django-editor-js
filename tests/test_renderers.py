@@ -228,6 +228,27 @@ class RendererTest(TestCase):
         self.assertIn('<p><a href="/ok">ok</a></p>', rendered)
         self.assertIn("<p><a>bad</a></p>", rendered)
 
+    def test_inline_highlight_and_font_size_are_preserved(self):
+        """Markup from the highlight and font size inline tools survives."""
+        text = ('Some <mark class="cdx-marker">highlighted</mark> and '
+                '<span class="cdx-font-size" style="font-size: 1.4em">big</span> text')
+        data = {"blocks": [{"type": "paragraph", "data": {"text": text}}]}
+        self.assertEqual(EditorJsRenderer(data).render(), f"<p>{text}</p>")
+
+    def test_inline_span_and_mark_attributes_are_validated(self):
+        """Only cdx-* classes and font-size styles survive on span/mark."""
+        data = {
+            "blocks": [
+                {"type": "paragraph", "data": {"text": '<span class="evil" style="position: fixed">x</span>'}},
+                {"type": "paragraph", "data": {"text": '<mark class="evil">y</mark>'}},
+                {"type": "paragraph", "data": {"text": '<span style="font-size: 12px; color: red">z</span>'}},
+            ]
+        }
+        rendered = EditorJsRenderer(data).render()
+        self.assertIn("<p><span>x</span></p>", rendered)
+        self.assertIn("<p><mark>y</mark></p>", rendered)
+        self.assertIn("<p><span>z</span></p>", rendered)
+
     def test_render_image_caption_with_markup(self):
         """The figcaption keeps inline markup while the alt is plain text."""
         data = {"blocks": [{"type": "image", "data": {"file": {"url": "/media/i.jpg"}, "caption": "My <b>caption</b>"}}]}
