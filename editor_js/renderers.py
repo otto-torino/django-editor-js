@@ -1,5 +1,63 @@
 import json
 import html
+import re
+from html.parser import HTMLParser
+
+from django.utils.html import strip_tags
+
+
+class _InlineHTMLSanitizer(HTMLParser):
+    """
+    Allowlist sanitizer for the markup produced by the Editor.js inline
+    toolbar (bold, italic, links, ...). Disallowed tags are dropped while
+    their text content is kept; attribute values are escaped and unsafe
+    URL schemes are removed.
+    """
+
+    ALLOWED_TAGS = {
+        'a': ('href', 'target', 'rel'),
+        'b': (), 'strong': (), 'i': (), 'em': (),
+        'u': (), 's': (), 'code': (), 'mark': (),
+        'sup': (), 'sub': (), 'br': (),
+    }
+    UNSAFE_URL_RE = re.compile(r'^\s*(javascript|data|vbscript):', re.IGNORECASE)
+
+    def __init__(self):
+        super().__init__(convert_charrefs=False)
+        self.parts = []
+
+    def handle_starttag(self, tag, attrs):
+        allowed_attrs = self.ALLOWED_TAGS.get(tag)
+        if allowed_attrs is None:
+            return
+        rendered_attrs = ''
+        for name, value in attrs:
+            if name not in allowed_attrs or value is None:
+                continue
+            if name == 'href' and self.UNSAFE_URL_RE.match(value):
+                continue
+            rendered_attrs += f' {name}="{html.escape(value)}"'
+        self.parts.append(f'<{tag}{rendered_attrs}>')
+
+    def handle_startendtag(self, tag, attrs):
+        self.handle_starttag(tag, attrs)
+
+    def handle_endtag(self, tag):
+        if tag in self.ALLOWED_TAGS and tag != 'br':
+            self.parts.append(f'</{tag}>')
+
+    def handle_data(self, data):
+        self.parts.append(html.escape(data, quote=False))
+
+    def handle_entityref(self, name):
+        self.parts.append(f'&{name};')
+
+    def handle_charref(self, name):
+        self.parts.append(f'&#{name};')
+
+    def result(self):
+        return ''.join(self.parts)
+
 
 class EditorJsRenderer:
     def __init__(self, data, safe=True):
@@ -32,13 +90,26 @@ class EditorJsRenderer:
     def escape(self, text):
         return html.escape(text) if self.safe else text
 
+    def clean_inline(self, text):
+        """
+        Clean text that may carry inline-toolbar markup (bold, italic,
+        links, ...): allowed inline tags pass through, everything else is
+        dropped. Full escaping here would show the markup as literal text.
+        """
+        if not self.safe:
+            return text
+        sanitizer = _InlineHTMLSanitizer()
+        sanitizer.feed(str(text))
+        sanitizer.close()
+        return sanitizer.result()
+
     def render_paragraph(self, data):
-        text = data.get("text", "") 
+        text = self.clean_inline(data.get("text", ""))
         return f"<p>{text}</p>"
 
     def render_header(self, data):
         level = data.get("level", 2)
-        text = self.escape(data.get("text", ""))
+        text = self.clean_inline(data.get("text", ""))
         return f"<h{level}>{text}</h{level}>"
 
     def render_list(self, data):
@@ -48,9 +119,9 @@ class EditorJsRenderer:
                 if isinstance(item, dict) and "items" in item:
                     # Nested list
                     nested_tag = "ul" if item.get("style") == "unordered" else "ol"
-                    html_items += f"<li>{self.escape(item.get('content', ''))}{render_items(item['items'])}</li>"
+                    html_items += f"<li>{self.clean_inline(item.get('content', ''))}{render_items(item['items'])}</li>"
                 else:
-                    html_items += f"<li>{self.escape(item)}</li>"
+                    html_items += f"<li>{self.clean_inline(item)}</li>"
             return f"<{tag}>{html_items}</{tag}>"
 
         tag = "ul" if data.get("style") == "unordered" else "ol"
@@ -58,8 +129,8 @@ class EditorJsRenderer:
         return render_items(items)
 
     def render_quote(self, data):
-        text = self.escape(data.get("text", ""))
-        caption = self.escape(data.get("caption", ""))
+        text = self.clean_inline(data.get("text", ""))
+        caption = self.clean_inline(data.get("caption", ""))
         alignment = data.get("alignment", "left")
         return f'<blockquote style="text-align: {alignment};"><p>{text}</p><footer>{caption}</footer></blockquote>'
 
@@ -69,8 +140,11 @@ class EditorJsRenderer:
     
     def render_image(self, data):
         url = data.get("file", {}).get("url", "")
-        caption = self.escape(data.get("caption", ""))
-        return f'<figure><img src="{self.escape(url)}" alt="{caption}"><figcaption>{caption}</figcaption></figure>'
+        caption = data.get("caption", "")
+        # The alt attribute must be plain text; the visible caption keeps
+        # its inline markup.
+        alt = self.escape(strip_tags(caption)) if self.safe else caption
+        return f'<figure><img src="{self.escape(url)}" alt="{alt}"><figcaption>{self.clean_inline(caption)}</figcaption></figure>'
     
     def render_table(self, data):
         rows = data.get("content", [])
@@ -82,13 +156,13 @@ class EditorJsRenderer:
         if has_headings and rows:
             headings = rows[0]
             rows = rows[1:]
-            html_headings = "".join(f"<th>{self.escape(cell)}</th>" for cell in headings)
+            html_headings = "".join(f"<th>{self.clean_inline(cell)}</th>" for cell in headings)
             html_rows = [f"<tr>{html_headings}</tr>"]
         else:
             html_rows = []
 
         for row in rows:
-            html_cells = "".join(f"<td>{self.escape(cell)}</td>" for cell in row)
+            html_cells = "".join(f"<td>{self.clean_inline(cell)}</td>" for cell in row)
             html_rows.append(f"<tr>{html_cells}</tr>")
         
         if has_headings:
@@ -108,7 +182,7 @@ class EditorJsRenderer:
     def render_embed(self, data):
         service = self.escape(data.get("service", ""))
         embed_url = self.escape(data.get("embed", ""))
-        caption = self.escape(data.get("caption", ""))
+        caption = self.clean_inline(data.get("caption", ""))
 
         if not embed_url:
             return ""

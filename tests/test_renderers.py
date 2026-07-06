@@ -192,6 +192,49 @@ class RendererTest(TestCase):
         renderer = EditorJsRenderer(data, safe=False)
         self.assertEqual(renderer.render(), "<h2><b>Bold Title</b></h2>")
 
+    def test_inline_markup_is_preserved(self):
+        """Inline-toolbar markup (bold, italic, links) survives rendering."""
+        data = {
+            "blocks": [
+                {"type": "header", "data": {"text": "A <b>bold</b> title", "level": 2}},
+                {"type": "list", "data": {"style": "unordered", "items": ["An <i>italic</i> item"]}},
+                {"type": "quote", "data": {"text": "A <mark>marked</mark> quote", "caption": "someone"}},
+                {"type": "table", "data": {"withHeadings": False, "content": [["A <b>cell</b>"]]}},
+            ]
+        }
+        rendered = EditorJsRenderer(data).render()
+        self.assertIn("<h2>A <b>bold</b> title</h2>", rendered)
+        self.assertIn("<li>An <i>italic</i> item</li>", rendered)
+        self.assertIn("<p>A <mark>marked</mark> quote</p>", rendered)
+        self.assertIn("<td>A <b>cell</b></td>", rendered)
+
+    def test_inline_link_with_target_is_preserved(self):
+        """Anchors keep href, target and rel attributes."""
+        text = 'Go <a href="https://example.com" target="_blank" rel="noopener noreferrer">here</a>'
+        data = {"blocks": [{"type": "paragraph", "data": {"text": text}}]}
+        self.assertEqual(EditorJsRenderer(data).render(), f"<p>{text}</p>")
+
+    def test_inline_markup_is_sanitized(self):
+        """Disallowed tags, attributes and URL schemes are stripped."""
+        data = {
+            "blocks": [
+                {"type": "header", "data": {"text": "<script>alert(1)</script>Title", "level": 2}},
+                {"type": "paragraph", "data": {"text": '<a href="/ok" onclick="evil()">ok</a>'}},
+                {"type": "paragraph", "data": {"text": '<a href="javascript:alert(1)">bad</a>'}},
+            ]
+        }
+        rendered = EditorJsRenderer(data).render()
+        self.assertIn("<h2>alert(1)Title</h2>", rendered)
+        self.assertIn('<p><a href="/ok">ok</a></p>', rendered)
+        self.assertIn("<p><a>bad</a></p>", rendered)
+
+    def test_render_image_caption_with_markup(self):
+        """The figcaption keeps inline markup while the alt is plain text."""
+        data = {"blocks": [{"type": "image", "data": {"file": {"url": "/media/i.jpg"}, "caption": "My <b>caption</b>"}}]}
+        rendered = EditorJsRenderer(data).render()
+        self.assertIn('alt="My caption"', rendered)
+        self.assertIn("<figcaption>My <b>caption</b></figcaption>", rendered)
+
     def test_render_empty_table(self):
         """Tests the rendering of an empty table."""
         data = {
