@@ -231,6 +231,12 @@ The Editor.js inline toolbar (bold, italic, link, ...) is **enabled by default f
 }
 ```
 
+### Links with "open in new tab"
+
+The native Editor.js inline link tool is replaced by a bundled one (`link`) that adds an **"Open in new tab"** checkbox: when checked, the anchor is saved with `target="_blank"` and `rel="noopener noreferrer"`. Same icons and behavior as the native tool otherwise.
+
+It is used everywhere by default — including fields that define their own per-field `tools` — unless a configuration addresses the `'link'` key itself: set it to `None` (in `EDITOR_JS['TOOLS']` or in a per-field `tools` dict) to restore the native link tool, or override it with your own tool like any other.
+
 ### Custom HTML Rendering
 
 If you add a custom tool, you'll need to tell Django how to render it.

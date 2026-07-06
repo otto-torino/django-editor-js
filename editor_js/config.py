@@ -47,6 +47,13 @@ DEFAULT_EDITOR_JS_TOOLS = {
         'class': 'DividerTool',
         'script': 'editor_js/js/plugins/divider-tool.js',
         'static': True,
+    },
+    # Inline tool: replaces the native Editor.js link with one that supports
+    # an "open in new tab" (target="_blank") option.
+    'link': {
+        'class': 'LinkWithTargetTool',
+        'script': 'editor_js/js/plugins/link-tool.js',
+        'static': True,
     }
 }
 

@@ -51,7 +51,15 @@
         console.log('[DEBUG] 4. _buildTools received override:', toolsOverride);
 
         const useOverride = toolsOverride && Object.keys(toolsOverride).length > 0;
-        const activeToolsConfig = useOverride ? toolsOverride : _config.toolsConfig;
+        const activeToolsConfig = useOverride ? { ...toolsOverride } : _config.toolsConfig;
+
+        // The bundled link tool (with its "open in new tab" option) replaces
+        // the native Editor.js one everywhere, including field-specific
+        // overrides — unless the override addresses 'link' itself (e.g. sets
+        // it to null to restore the native tool).
+        if (useOverride && !('link' in toolsOverride) && _config.toolsConfig.link) {
+            activeToolsConfig.link = _config.toolsConfig.link;
+        }
         
         console.log(`[DEBUG] 5. Using ${useOverride ? 'specific' : 'default'} tools config:`, activeToolsConfig);
 
