@@ -208,6 +208,29 @@ You can fully control the tools available in the editor via the `EDITOR_JS['TOOL
 
 The library comes with the following default tools: **Header**, **List**, **Quote**, **Table**, **Raw HTML**, **Embed**, **Image**, **Button**, and **Divider**.
 
+### Inline Toolbar
+
+The Editor.js inline toolbar (bold, italic, link, ...) is **enabled by default for every tool**, including custom ones. To disable it for a specific tool — or to restrict which actions it offers — set `inlineToolbar` in the tool's configuration:
+
+```python
+"TOOLS": {
+    # Disable the inline toolbar for headers
+    'header': {
+        'class': 'Header',
+        'script': 'editor_js/js/vendor/editorjs/header.min.js',
+        'static': True,
+        'inlineToolbar': False,
+    },
+    # Only allow bold and link inside lists
+    'list': {
+        'class': 'EditorjsList',
+        'script': 'editor_js/js/vendor/editorjs/list.min.js',
+        'static': True,
+        'inlineToolbar': ['bold', 'link'],
+    },
+}
+```
+
 ### Custom HTML Rendering
 
 If you add a custom tool, you'll need to tell Django how to render it.

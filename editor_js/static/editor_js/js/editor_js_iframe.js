@@ -70,10 +70,24 @@
                         additionalRequestHeaders: { 'X-CSRFToken': _config.csrfToken }
                     };
                 }
-                tools[name] = { class: toolClass, config: finalConfig };
-                if (Object.keys(finalConfig).length === 0) {
-                    tools[name] = toolClass;
+
+                // Tool-level Editor.js settings (siblings of `class`, not part of
+                // the tool's own `config`): forward them if declared.
+                // The inline toolbar is on by default; a tool config can opt out
+                // with `inlineToolbar: False` (or restrict it with an array).
+                const toolSettings = { class: toolClass };
+                toolSettings.inlineToolbar = toolInfo.inlineToolbar !== undefined
+                    ? toolInfo.inlineToolbar
+                    : true;
+                ['shortcut', 'toolbox'].forEach(function (key) {
+                    if (toolInfo[key] !== undefined) {
+                        toolSettings[key] = toolInfo[key];
+                    }
+                });
+                if (Object.keys(finalConfig).length > 0) {
+                    toolSettings.config = finalConfig;
                 }
+                tools[name] = toolSettings;
             } else {
                 console.warn(`[DjangoEditorJSIframe] Tool class '${toolInfo.class}' was not found.`);
             }

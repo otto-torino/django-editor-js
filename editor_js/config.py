@@ -22,9 +22,6 @@ DEFAULT_EDITOR_JS_TOOLS = {
         'class': 'Table',
         'script': 'editor_js/js/vendor/editorjs/table.min.js',
         'static': True,
-        'config': {
-            'inlineToolbar': True,
-        }
     },
     'raw': {
         'class': 'RawTool',
@@ -35,9 +32,6 @@ DEFAULT_EDITOR_JS_TOOLS = {
         'class': 'Embed',
         'script': 'editor_js/js/vendor/editorjs/embed.min.js',
         'static': True,
-        'config': {
-            'inlineToolbar': True,
-        }
     },
     'image': {
         'class': 'ImageTool',
