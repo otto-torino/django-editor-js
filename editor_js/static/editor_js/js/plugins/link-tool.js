@@ -31,6 +31,10 @@ class LinkWithTargetTool {
         return '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M15.7795 11.5C15.7795 11.5 16.053 11.1962 16.5497 10.6722C17.4442 9.72856 17.4701 8.2475 16.5781 7.30145V7.30145C15.6482 6.31522 14.0873 6.29227 13.1288 7.25073L11.8796 8.49999"/><path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M8.24517 12.3883C8.24517 12.3883 7.97171 12.6922 7.47504 13.2161C6.58051 14.1598 6.55467 15.6408 7.44666 16.5869V16.5869C8.37653 17.5731 9.93744 17.5961 10.8959 16.6376L12.1452 15.3883"/><path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M17.7802 15.1032L16.597 14.9422C16.0109 14.8624 15.4841 15.3059 15.4627 15.8969L15.4199 17.0818"/><path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M6.39064 9.03238L7.58432 9.06668C8.17551 9.08366 8.6522 8.58665 8.61056 7.99669L8.5271 6.81397"/><line x1="12.1142" x2="11.7" y1="12.2" y2="11.7858" stroke="currentColor" stroke-linecap="round" stroke-width="2"/></svg>';
     }
 
+    static get ICON_ENTER() {
+        return '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7v4a4 4 0 0 1-4 4H5m4-4-4 4 4 4"/></svg>';
+    }
+
     constructor({ api }) {
         this.commandLink = 'createLink';
         this.commandUnlink = 'unlink';
@@ -48,7 +52,8 @@ class LinkWithTargetTool {
             wrapper: null,
             input: null,
             checkboxRow: null,
-            checkbox: null
+            checkbox: null,
+            saveButton: null
         };
         this.inputOpened = false;
         this.fakeBackgroundEnabled = false;
@@ -69,11 +74,15 @@ class LinkWithTargetTool {
 
     renderActions() {
         this.nodes.wrapper = document.createElement('div');
+        this.nodes.wrapper.style.width = '300px';
+        this.nodes.wrapper.style.maxWidth = 'calc(100vw - 32px)';
 
         this.nodes.input = document.createElement('input');
         this.nodes.input.placeholder = this.i18n.t('Add a link');
         this.nodes.input.enterKeyHint = 'done';
         this.nodes.input.classList.add(this.CSS.input);
+        this.nodes.input.style.width = '100%';
+        this.nodes.input.style.boxSizing = 'border-box';
         this.nodes.input.addEventListener('keydown', (event) => {
             if (event.keyCode === this.ENTER_KEY) {
                 this.enterPressed(event);
@@ -106,10 +115,40 @@ class LinkWithTargetTool {
             document.createTextNode(this.i18n.t('Open in new tab'))
         );
 
+        const saveLabel = this.i18n.t('Save link (Enter)');
+        this.nodes.saveButton = document.createElement('button');
+        this.nodes.saveButton.type = 'button';
+        this.nodes.saveButton.classList.add(this.CSS.button);
+        this.nodes.saveButton.style.marginLeft = 'auto';
+        this.nodes.saveButton.innerHTML = LinkWithTargetTool.ICON_ENTER;
+        this.nodes.saveButton.title = saveLabel;
+        this.nodes.saveButton.setAttribute('aria-label', saveLabel);
+        this.nodes.saveButton.addEventListener('mousedown', (event) => {
+            // Do not replace the saved editor selection with the button.
+            event.preventDefault();
+        });
+        this.nodes.saveButton.addEventListener('click', (event) => {
+            this.saveLink(event);
+        });
+
         this.nodes.checkboxRow.appendChild(checkboxLabel);
+        this.nodes.checkboxRow.appendChild(this.nodes.saveButton);
 
         this.nodes.wrapper.appendChild(this.nodes.input);
         this.nodes.wrapper.appendChild(this.nodes.checkboxRow);
+        this.nodes.wrapper.addEventListener('focusout', (event) => {
+            const nextTarget = event.relatedTarget;
+
+            // Moving between the URL, checkbox and save button is still an
+            // interaction with this panel and must not submit the link.
+            if (nextTarget && this.nodes.wrapper.contains(nextTarget)) {
+                return;
+            }
+
+            if (this.inputOpened) {
+                this.saveLink(event);
+            }
+        });
 
         return this.nodes.wrapper;
     }
@@ -182,6 +221,14 @@ class LinkWithTargetTool {
     }
 
     openActions(needFocus = false) {
+        const actionsPopover = this.nodes.wrapper.closest('.ce-popover--nested');
+        if (actionsPopover) {
+            // Editor.js fixes nested popovers to --width: 200px. Override the
+            // variable on this panel so its container, border and shadow all
+            // grow together with the link controls.
+            actionsPopover.style.setProperty('--width', '300px');
+        }
+
         this.nodes.input.classList.add(this.CSS.inputShowed);
         this.nodes.checkboxRow.style.display = 'flex';
         if (needFocus) {
@@ -249,6 +296,9 @@ class LinkWithTargetTool {
         event.stopPropagation();
         event.stopImmediatePropagation();
 
+        // Prevent a focusout caused by closing the toolbar from submitting
+        // the same link a second time.
+        this.inputOpened = false;
         this.collapseToEnd();
         this.inlineToolbar.close();
     }
