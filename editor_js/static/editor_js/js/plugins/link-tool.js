@@ -80,21 +80,33 @@ class LinkWithTargetTool {
             }
         });
 
-        this.nodes.checkboxRow = document.createElement('label');
+        this.nodes.checkboxRow = document.createElement('div');
         this.nodes.checkboxRow.style.display = 'none';
         this.nodes.checkboxRow.style.alignItems = 'center';
         this.nodes.checkboxRow.style.gap = '6px';
         this.nodes.checkboxRow.style.padding = '4px 8px 8px';
         this.nodes.checkboxRow.style.fontSize = '13px';
-        this.nodes.checkboxRow.style.cursor = 'pointer';
+
+        const checkboxLabel = document.createElement('label');
+        checkboxLabel.style.display = 'flex';
+        checkboxLabel.style.alignItems = 'center';
+        checkboxLabel.style.gap = '6px';
+        checkboxLabel.style.cursor = 'pointer';
 
         this.nodes.checkbox = document.createElement('input');
         this.nodes.checkbox.type = 'checkbox';
+        this.nodes.checkbox.addEventListener('keydown', (event) => {
+            if (event.keyCode === this.ENTER_KEY) {
+                this.enterPressed(event);
+            }
+        });
 
-        this.nodes.checkboxRow.appendChild(this.nodes.checkbox);
-        this.nodes.checkboxRow.appendChild(
+        checkboxLabel.appendChild(this.nodes.checkbox);
+        checkboxLabel.appendChild(
             document.createTextNode(this.i18n.t('Open in new tab'))
         );
+
+        this.nodes.checkboxRow.appendChild(checkboxLabel);
 
         this.nodes.wrapper.appendChild(this.nodes.input);
         this.nodes.wrapper.appendChild(this.nodes.checkboxRow);
@@ -204,6 +216,10 @@ class LinkWithTargetTool {
     }
 
     enterPressed(event) {
+        this.saveLink(event);
+    }
+
+    saveLink(event) {
         let value = this.nodes.input.value || '';
 
         if (!value.trim()) {
