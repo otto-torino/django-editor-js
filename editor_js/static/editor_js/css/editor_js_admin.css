@@ -339,6 +339,17 @@ tr:nth-child(even) {
     padding-left: 40px !important;
 }
 
+.button-settings-input-wrapper input.button-settings-input-invalid {
+    border-color: #dc3545;
+}
+
+.button-missing-url-hint {
+    margin-top: 6px;
+    color: #dc3545;
+    font-family: sans-serif;
+    font-size: 13px;
+}
+
 .button-settings-colors {
     display: flex;
     gap: 8px;

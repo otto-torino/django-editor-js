@@ -6,8 +6,9 @@ class ButtonTool {
         };
     }
 
-    constructor({ data, api }) {
+    constructor({ data, api, block }) {
         this.api = api;
+        this.block = block;
         this.data = {
             text: data.text || 'Click me',
             url: data.url || '',
@@ -17,6 +18,8 @@ class ButtonTool {
 
         this.wrapper = null;
         this.preview = null;
+        this.missingUrlHint = null;
+        this.urlInput = null;
     }
 
     render() {
@@ -25,7 +28,13 @@ class ButtonTool {
         
         this.wrapper.style.textAlign = this.data.alignment;
 
+        this.missingUrlHint = document.createElement('div');
+        this.missingUrlHint.className = 'button-missing-url-hint';
+        this.missingUrlHint.innerText = 'Add a URL in the block settings, or this button will not be saved.';
+
         this.wrapper.appendChild(this.preview);
+        this.wrapper.appendChild(this.missingUrlHint);
+        this._updateMissingUrlState();
         return this.wrapper;
     }
 
@@ -48,9 +57,14 @@ class ButtonTool {
             icon: iconLink,
             placeholder: 'https://example.com',
             value: this.data.url,
-            onInput: (value) => { this.data.url = value; }
+            onInput: (value) => {
+                this.data.url = value;
+                this._updateMissingUrlState();
+            }
         });
         urlInput.style.marginTop = '10px';
+        this.urlInput = urlInput.querySelector('input');
+        this._updateMissingUrlState();
 
         const colorButtonsWrapper = document.createElement('div');
         colorButtonsWrapper.style.display = 'flex';
@@ -127,6 +141,13 @@ class ButtonTool {
         }
     }
 
+    // validate() drops a button without url on save: flag it while editing.
+    _updateMissingUrlState() {
+        const missing = !this.data.url.trim();
+        if (this.missingUrlHint) this.missingUrlHint.hidden = !missing;
+        if (this.urlInput) this.urlInput.classList.toggle('button-settings-input-invalid', missing);
+    }
+
     _createSettingInput({ icon, placeholder, value, onInput }) {
         const wrapper = document.createElement('div');
         wrapper.classList.add('button-settings-input-wrapper');
@@ -137,7 +158,10 @@ class ButtonTool {
         input.placeholder = placeholder;
         input.value = value;
         input.className = this.api.styles.input;
-        input.addEventListener('input', () => onInput(input.value));
+        input.addEventListener('input', () => {
+            onInput(input.value);
+            this._dispatchChange();
+        });
         wrapper.appendChild(iconElement);
         wrapper.appendChild(input);
         return wrapper;
@@ -148,8 +172,18 @@ class ButtonTool {
         button.classList.add(this.api.styles.settingsButton);
         button.innerHTML = innerHTML;
         button.dataset.value = dataValue;
-        button.addEventListener('click', onClick);
+        button.addEventListener('click', () => {
+            onClick();
+            this._dispatchChange();
+        });
         return button;
+    }
+
+    // The settings inputs live outside the block, so Editor.js does not see
+    // their edits: notify it, or the saved data keeps the old values (and a
+    // button saved without url is dropped by validate()).
+    _dispatchChange() {
+        if (this.block) this.block.dispatchChange();
     }
 
     _updateActiveButtons(container) {
