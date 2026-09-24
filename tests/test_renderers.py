@@ -107,6 +107,26 @@ class RendererTest(TestCase):
         renderer_ol = EditorJsRenderer(data_ol)
         self.assertEqual(renderer_ol.render(), "<ol><li>One</li><li>Two</li></ol>")
 
+    def test_render_list_with_current_editorjs_item_format(self):
+        """The bundled list tool stores every item as a recursive object."""
+        data = {
+            "blocks": [{
+                "type": "list",
+                "data": {
+                    "style": "unordered",
+                    "meta": {},
+                    "items": [
+                        {"content": "One", "meta": {}, "items": []},
+                        {"content": "Two", "meta": {}, "items": []},
+                    ],
+                },
+            }]
+        }
+        self.assertEqual(
+            EditorJsRenderer(data).render(),
+            "<ul><li>One</li><li>Two</li></ul>",
+        )
+
     def test_render_nested_list(self):
         """Tests a list with nested items."""
         data = {
@@ -184,6 +204,21 @@ class RendererTest(TestCase):
         data = {"blocks": [{"type": "divider", "data": {}}]}
         renderer = EditorJsRenderer(data)
         self.assertEqual(renderer.render(), "<hr>")
+
+    def test_render_spacer(self):
+        data = {"blocks": [{"type": "spacer", "data": {"size": "large"}}]}
+        self.assertEqual(
+            EditorJsRenderer(data).render(),
+            '<div class="editor-js-spacer editor-js-spacer--large" '
+            'style="height: 4rem;" aria-hidden="true"></div>',
+        )
+
+    def test_render_spacer_rejects_unknown_size(self):
+        data = {"blocks": [{"type": "spacer", "data": {"size": "100vh"}}]}
+        self.assertIn(
+            'style="height: 2rem;"',
+            EditorJsRenderer(data).render(),
+        )
 
     def test_render_with_safe_false(self):
         """Tests that with safe=False, HTML is not escaped."""

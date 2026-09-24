@@ -130,6 +130,11 @@ class Post(models.Model):
 
 The field will automatically render the iframe widget in the Django admin.
 
+### Editor interactions
+
+- **Add vertical space:** open the block menu with the `+` button and choose **Spacer**. Its block settings let you choose a small, medium, or large gap.
+- **Convert blocks:** select two or more consecutive paragraphs and choose **Bulleted list** or **Numbered list**. When a list block is selected, the same toolbar can switch its list style or convert every item back to a normal paragraph. Inline formatting is preserved.
+
 ### Rendering Content in Templates
 
 The library includes a built-in template filter to easily render your `EditorJSField` data as HTML.
@@ -206,7 +211,7 @@ You can fully control the tools available in the editor via the `EDITOR_JS['TOOL
     }
     ```
 
-The library comes with the following default tools: **Header**, **List**, **Quote**, **Table**, **Raw HTML**, **Embed**, **Image**, **Button**, and **Divider**.
+The library comes with the following default tools: **Header**, **List**, **Quote**, **Table**, **Raw HTML**, **Embed**, **Image**, **Button**, **Divider**, and **Spacer**.
 
 ### Inline Toolbar
 

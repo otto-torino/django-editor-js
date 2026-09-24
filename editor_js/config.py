@@ -48,6 +48,11 @@ DEFAULT_EDITOR_JS_TOOLS = {
         'script': 'editor_js/js/plugins/divider-tool.js',
         'static': True,
     },
+    'spacer': {
+        'class': 'SpacerTool',
+        'script': 'editor_js/js/plugins/spacer-tool.js',
+        'static': True,
+    },
     # Inline tool: replaces the native Editor.js link with one that supports
     # an "open in new tab" (target="_blank") option.
     'link': {

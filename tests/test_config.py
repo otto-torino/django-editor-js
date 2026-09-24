@@ -28,6 +28,9 @@ class ConfigTestCase(TestCase):
         self.assertIn('list', tools)
         self.assertEqual(tools['list']['class'], 'EditorjsList')
 
+        self.assertIn('spacer', tools)
+        self.assertEqual(tools['spacer']['class'], 'SpacerTool')
+
 
 class StorageTestCase(TestCase):
     @override_settings(EDITOR_JS={

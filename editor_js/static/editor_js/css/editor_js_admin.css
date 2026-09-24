@@ -127,6 +127,88 @@ hr {
     margin: 2rem 0;
 }
 
+/* Explicit whitespace block. Its dashed guide is visible only in the editor. */
+.editor-js-spacer {
+    position: relative;
+    min-height: 1rem;
+}
+
+.editor-js-spacer[data-size="small"],
+.editor-js-spacer--small {
+    height: 1rem;
+}
+
+.editor-js-spacer[data-size="medium"],
+.editor-js-spacer--medium {
+    height: 2rem;
+}
+
+.editor-js-spacer[data-size="large"],
+.editor-js-spacer--large {
+    height: 4rem;
+}
+
+.codex-editor .editor-js-spacer::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 0;
+    left: 0;
+    border-top: 1px dashed var(--table-border);
+}
+
+.editor-js-bulk-list-control {
+    position: fixed;
+    z-index: 20;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.2rem;
+    max-width: calc(100vw - 16px);
+    padding: 0.25rem;
+    border: 1px solid var(--table-border);
+    border-radius: 6px;
+    background: var(--figure-bg);
+    color: var(--text-color);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.14);
+}
+
+.editor-js-bulk-list-action {
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.55rem;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font: 600 13px/1.2 sans-serif;
+}
+
+.editor-js-bulk-list-action:hover,
+.editor-js-bulk-list-action:focus-visible {
+    background: var(--blockquote-bg);
+}
+
+.editor-js-bulk-list-action:disabled {
+    cursor: wait;
+    opacity: 0.55;
+}
+
+.editor-js-bulk-list-action[hidden] {
+    display: none;
+}
+
+.editor-js-bulk-list-action svg {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+}
+
+
 figure {
     margin: 2rem auto;
     max-width: 700px;

@@ -124,20 +124,22 @@ class EditorJsRenderer:
         return f"<h{level}>{text}</h{level}>"
 
     def render_list(self, data):
-        def render_items(items):
+        def render_items(items, style):
+            tag = "ul" if style == "unordered" else "ol"
             html_items = ""
             for item in items:
-                if isinstance(item, dict) and "items" in item:
-                    # Nested list
-                    nested_tag = "ul" if item.get("style") == "unordered" else "ol"
-                    html_items += f"<li>{self.clean_inline(item.get('content', ''))}{render_items(item['items'])}</li>"
+                if isinstance(item, dict):
+                    content = self.clean_inline(item.get("content", ""))
+                    children = item.get("items", [])
+                    child_style = item.get("style", style)
+                    nested = render_items(children, child_style) if children else ""
+                    html_items += f"<li>{content}{nested}</li>"
                 else:
                     html_items += f"<li>{self.clean_inline(item)}</li>"
             return f"<{tag}>{html_items}</{tag}>"
 
-        tag = "ul" if data.get("style") == "unordered" else "ol"
         items = data.get("items", [])
-        return render_items(items)
+        return render_items(items, data.get("style", "unordered"))
 
     def render_quote(self, data):
         text = self.clean_inline(data.get("text", ""))
@@ -219,6 +221,16 @@ class EditorJsRenderer:
     
     def render_divider(self, data):
         return '<hr>'
+
+    def render_spacer(self, data):
+        size = data.get("size", "medium")
+        if size not in {"small", "medium", "large"}:
+            size = "medium"
+        heights = {"small": "1rem", "medium": "2rem", "large": "4rem"}
+        return (
+            f'<div class="editor-js-spacer editor-js-spacer--{size}" '
+            f'style="height: {heights[size]};" aria-hidden="true"></div>'
+        )
 
 
     def render_unknown(self, data):
