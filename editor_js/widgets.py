@@ -22,9 +22,14 @@ class EditorJsIframeWidget(forms.Widget):
         return context
 
     class Media:
+        css = {
+            'all': ('editor_js/css/editor_js_widget.css',),
+        }
         js = (
             # iframe resizer
             'editor_js/js/vendor/iframe-resizer/iframeResizer.min.js',
+            # the widget, which initializes itself
+            'editor_js/js/editor_js_widget.js',
             # Django Baton AI bridge: registers an editor adapter on Baton.AI so
             # translation/summarization/correction work on Editor.js fields.
             # No-op (and silent) when django-baton is not installed.

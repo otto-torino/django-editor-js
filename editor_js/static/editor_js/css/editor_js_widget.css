@@ -1,0 +1,34 @@
+/* The widget in the admin page, outside the iframe of the editor. */
+.editor-js-fullscreen-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 10;
+    padding: 6px;
+    color: var(--body-fg, #333);
+    background-color: var(--darkened-bg, #f0f0f0);
+    border: 1px solid var(--border-color, #ccc);
+    border-radius: 4px;
+    cursor: pointer;
+}
+.editor-js-fullscreen-button:hover,
+.editor-js-fullscreen-button:focus-visible {
+    background-color: var(--selected-bg, var(--darkened-bg, #e4e4e4));
+}
+.editor-js-fullscreen-button:focus-visible {
+    outline: 2px solid var(--primary, #79aec8);
+    outline-offset: 2px;
+}
+.editor-js-fullscreen-button svg {
+    display: block;
+}
+.editor-js-widget-wrapper:fullscreen {
+    background-color: var(--body-bg, #f8f9fa);
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.cdx-settings-button {
+    width: auto;
+}

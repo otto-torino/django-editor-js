@@ -1,4 +1,7 @@
 import json
+from pathlib import Path
+
+import editor_js
 from django.test import TestCase
 from django.urls import reverse
 
@@ -69,7 +72,7 @@ class WidgetTest(TestCase):
 
     def test_media_assets(self):
         """
-        Checks that the Media class correctly defines JavaScript assets.
+        Checks that the Media class correctly defines the widget assets.
         """
         widget = EditorJsIframeWidget()
         media = widget.media
@@ -78,7 +81,20 @@ class WidgetTest(TestCase):
             'editor_js/js/vendor/iframe-resizer/iframeResizer.min.js',
             media._js
         )
+        self.assertIn('editor_js/js/editor_js_widget.js', media._js)
         self.assertIn('editor_js/js/baton_adapter.js', media._js)
+        self.assertIn('editor_js/css/editor_js_widget.css', media._css['all'])
+
+    def test_render_has_no_inline_style_or_script(self):
+        """
+        Style and initialization come from the Media: inline ones would need the
+        nonce of a Content Security Policy, which widgets cannot know.
+        """
+        widget = EditorJsIframeWidget()
+        html = widget.render(name='content', value='', attrs={})
+
+        self.assertNotIn('<style', html)
+        self.assertNotIn('<script', html)
 
     def test_fullscreen_button_uses_themeable_styles(self):
         """
@@ -87,8 +103,24 @@ class WidgetTest(TestCase):
         """
         widget = EditorJsIframeWidget()
         html = widget.render(name='content', value='', attrs={})
+        css_path = Path(editor_js.__file__).parent / 'static/editor_js/css/editor_js_widget.css'
+        css = css_path.read_text()
 
         self.assertIn('class="editor-js-fullscreen-button"', html)
-        self.assertIn('color: var(--body-fg, #333);', html)
-        self.assertIn('background-color: var(--darkened-bg, #f0f0f0);', html)
-        self.assertNotIn('background-color: #f0f0f0', html)
+        self.assertIn('color: var(--body-fg, #333);', css)
+        self.assertIn('background-color: var(--darkened-bg, #f0f0f0);', css)
+        self.assertNotIn('background-color: #f0f0f0', css)
+
+
+class VendorScriptsTest(TestCase):
+
+    def test_vendor_scripts_need_no_eval(self):
+        """
+        No vendored script builds code from strings: a Content Security Policy
+        without 'unsafe-eval' would report it. The image tool is patched.
+        """
+        vendor = Path(editor_js.__file__).parent / 'static/editor_js/js/vendor/editorjs'
+        for script in vendor.glob('*.js'):
+            with self.subTest(script=script.name):
+                self.assertNotIn('new Function("return this")', script.read_text())
+

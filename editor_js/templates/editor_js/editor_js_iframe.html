@@ -1,14 +1,21 @@
 {% load static i18n %}
+{% comment %}
+    Every script and style carries the nonce of a Content Security Policy, when
+    there is one; csp_nonce.js, loaded first, gives it to the styles the
+    editor and its tools inject.
+{% endcomment %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>EditorJS</title>
-    <style>
+    {% if csp_nonce is not None %}<meta property="csp-nonce" content="{{ csp_nonce }}">{% endif %}
+    <script src="{% static 'editor_js/js/csp_nonce.js' %}"{% if csp_nonce is not None %} nonce="{{ csp_nonce }}"{% endif %}></script>
+    <style{% if csp_nonce is not None %} nonce="{{ csp_nonce }}"{% endif %}>
         body { margin: 0; padding: 12px; font-family: sans-serif; }
     </style>
     
-    {% for css_file in css_files %}<link rel="stylesheet" href="{% static css_file %}"> {% endfor %}
+    {% for css_file in css_files %}<link rel="stylesheet" href="{% static css_file %}"{% if csp_nonce is not None %} nonce="{{ csp_nonce }}"{% endif %}> {% endfor %}
 
 </head>
 <body 
@@ -20,23 +27,17 @@
 >
     <div id="editor-js-holder"></div>
     
-    <script src="{% static 'editor_js/js/vendor/editorjs/editorjs.min.js' %}"></script>
-    <script src="{% static 'editor_js/js/vendor/iframe-resizer/iframeResizer.contentWindow.min.js' %}"></script>
+    <script src="{% static 'editor_js/js/vendor/editorjs/editorjs.min.js' %}"{% if csp_nonce is not None %} nonce="{{ csp_nonce }}"{% endif %}></script>
+    <script src="{% static 'editor_js/js/vendor/iframe-resizer/iframeResizer.contentWindow.min.js' %}"{% if csp_nonce is not None %} nonce="{{ csp_nonce }}"{% endif %}></script>
 
     {% for name, config in tools_config.items %}
         {% if config.static %}
-            <script src="{% static config.script %}"></script>
+            <script src="{% static config.script %}"{% if csp_nonce is not None %} nonce="{{ csp_nonce }}"{% endif %}></script>
         {% else %}
-            <script src="{{ config.script }}"></script>
+            <script src="{{ config.script }}"{% if csp_nonce is not None %} nonce="{{ csp_nonce }}"{% endif %}></script>
         {% endif %}
     {% endfor %}
 
-    <script src="{% static 'editor_js/js/editor_js_iframe.js' %}"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            window.DjangoEditorJSIframe.init();
-        });
-    </script>
+    <script src="{% static 'editor_js/js/editor_js_iframe.js' %}"{% if csp_nonce is not None %} nonce="{{ csp_nonce }}"{% endif %}></script>
 </body>
 </html>

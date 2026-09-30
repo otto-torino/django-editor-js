@@ -1,5 +1,9 @@
 import os
+import re
 import shutil
+from unittest import skipUnless
+
+import django
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -23,6 +27,45 @@ class ViewsTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'editor_js/editor_js_iframe.html')
+
+    def test_iframe_has_no_inline_script(self):
+        """
+        Without a Content Security Policy no nonce is rendered, and every script
+        is a file: the iframe initializes itself from editor_js_iframe.js.
+        """
+        html = self.client.get(reverse('editor_js_iframe')).content.decode()
+
+        self.assertNotIn('nonce=', html)
+        self.assertEqual(
+            re.findall(r'<script(?![^>]*\bsrc=)[^>]*>', html), [],
+        )
+        # csp_nonce.js comes first, before the editor injects its styles
+        self.assertLess(html.index('csp_nonce.js'), html.index('editorjs.min.js'))
+
+    @skipUnless(django.VERSION >= (6, 0), "Django's CSP support needs Django >= 6.0")
+    def test_iframe_carries_the_csp_nonce(self):
+        templates = [{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'APP_DIRS': True,
+            'OPTIONS': {
+                'context_processors': ['django.template.context_processors.csp'],
+            },
+        }]
+        middleware = ['django.middleware.csp.ContentSecurityPolicyMiddleware']
+        from django.utils.csp import CSP
+
+        policy = {'script-src': [CSP.SELF, CSP.NONCE]}
+        with self.settings(TEMPLATES=templates, MIDDLEWARE=middleware, SECURE_CSP=policy):
+            response = self.client.get(reverse('editor_js_iframe'))
+        html = response.content.decode()
+
+        nonce = re.search(r"'nonce-([^']+)'", response.headers['Content-Security-Policy']).group(1)
+        tags = re.findall(r'<(?:script|style|link)\b[^>]*>', html)
+        self.assertTrue(tags)
+        for tag in tags:
+            self.assertIn(f'nonce="{nonce}"', tag)
+        # the tools reading the nonce from the page, like the table one
+        self.assertIn(f'<meta property="csp-nonce" content="{nonce}">', html)
 
     def test_image_upload_view_get_request(self):
         """Tests that a GET request to the upload view fails correctly."""

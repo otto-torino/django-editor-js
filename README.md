@@ -281,6 +281,14 @@ EDITOR_JS = {
 -   **Storage**: To use a different storage system (like Amazon S3), set the `STORAGE_BACKEND` setting to the dotted path of your storage class (e.g., `'storages.backends.s3boto3.S3Boto3Storage'`).
 -   **Styling**: To match the editor's appearance with your frontend, provide a list of paths to your custom CSS files in the `CSS_FILES` setting. These files will be loaded in the specified order inside the editor's iframe.
 
+### Content Security Policy
+
+The editor works under a nonce based [Content Security Policy](https://docs.djangoproject.com/en/stable/ref/csp/) (Django >= 6.0): enable `django.middleware.csp.ContentSecurityPolicyMiddleware` and the `django.template.context_processors.csp` context processor, and allow `CSP.NONCE` in `script-src` and `style-src`.
+
+- The widget has no inline script or style: its `Media` loads `editor_js_widget.css` and `editor_js_widget.js`, which initializes the widgets. Outside the admin, render `{{ form.media }}` as for any widget with assets.
+- In the editor iframe every script and style carries the nonce, and the styles Editor.js and its tools inject at runtime get it too.
+- The `style` attributes of the widget need `style-src-attr 'unsafe-inline'`.
+
 ## Baton AI Integration
 
 If you use [`django-baton`](https://github.com/otto-torino/django-baton) (>= 5.2) as your admin theme, this library integrates with **Baton AI out of the box — no configuration required**. Translation, summarization and correction work on your `EditorJSField`s, alongside CKEditor and native fields on the same form.

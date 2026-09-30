@@ -171,4 +171,18 @@
     // --- Global Exposure ---
     window.DjangoEditorJSWidget = DjangoEditorJSWidget;
 
+    // --- Auto Initialization ---
+    // The widget Media loads this script once, in the head of the page: it
+    // initializes the widgets itself, since an inline script calling init()
+    // would need the nonce of a Content Security Policy.
+    function _autoInit() {
+        DjangoEditorJSWidget.init('.editor-js-widget-wrapper');
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', _autoInit);
+    } else {
+        _autoInit();
+    }
+
 })(window, document);

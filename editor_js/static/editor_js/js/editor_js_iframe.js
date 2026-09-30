@@ -455,4 +455,13 @@
 
     window.DjangoEditorJSIframe = DjangoEditorJSIframe;
 
+    // --- Auto Initialization ---
+    // an inline script calling init() would need the nonce of a Content
+    // Security Policy
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', DjangoEditorJSIframe.init);
+    } else {
+        DjangoEditorJSIframe.init();
+    }
+
 })(window, document);
