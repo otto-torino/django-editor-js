@@ -40,7 +40,8 @@
         const iframeOrigin = new URL(iframe.src).origin;
 
         _setupFullscreen(wrapper, fullscreenBtn);
-        _setupMessageListener(iframe, hiddenTextarea, iframeOrigin);
+        _setupMessageListener(wrapper, iframe, hiddenTextarea, iframeOrigin);
+        _updateWordCount(wrapper, initialData);
 
         if (typeof window.iFrameResize === 'function') {
             window.iFrameResize({ log: false, checkOrigin: false }, iframe);
@@ -79,12 +80,89 @@
     }
 
     /**
+     * Counts the words a reader reads in Editor.js data: the text of
+     * paragraphs, headers, lists, quotes, tables and buttons, and the
+     * captions, without their markup. Code and raw HTML are not counted.
+     * @param {object} data - The `{blocks: [...]}` object.
+     * @returns {number} The number of words.
+     */
+    function _countWords(data) {
+        const texts = [];
+
+        function addListItems(items) {
+            (items || []).forEach(function (item) {
+                if (item !== null && typeof item === 'object') {
+                    texts.push(item.content);
+                    addListItems(item.items);
+                } else {
+                    texts.push(item);
+                }
+            });
+        }
+
+        ((data && data.blocks) || []).forEach(function (block) {
+            const blockData = block.data || {};
+            switch (block.type) {
+                case 'paragraph':
+                case 'header':
+                case 'button':
+                    texts.push(blockData.text);
+                    break;
+                case 'list':
+                    addListItems(blockData.items);
+                    break;
+                case 'quote':
+                    texts.push(blockData.text, blockData.caption);
+                    break;
+                case 'table':
+                    (blockData.content || []).forEach(function (row) {
+                        texts.push.apply(texts, row);
+                    });
+                    break;
+                case 'image':
+                case 'embed':
+                    texts.push(blockData.caption);
+                    break;
+            }
+        });
+
+        // a parsed document has no browsing context: it loads and runs nothing
+        const parser = new DOMParser();
+        return texts.reduce(function (count, html) {
+            if (!html) return count;
+            // a line break separates two words, like a space
+            const text = parser.parseFromString(
+                String(html).replace(/<br\s*\/?>/gi, ' '), 'text/html'
+            ).body.textContent;
+            // a dash or another sign alone is not a word
+            return count + text.split(/\s+/).filter(function (word) {
+                return /[\p{L}\p{N}]/u.test(word);
+            }).length;
+        }, 0);
+    }
+
+    /**
+     * Writes the number of words of the editor under it.
+     * @param {HTMLElement} wrapper - The widget's container element.
+     * @param {object} data - The `{blocks: [...]}` object.
+     */
+    function _updateWordCount(wrapper, data) {
+        const counter = wrapper.querySelector('.editor-js-word-count');
+        if (!counter) return;
+
+        const count = _countWords(data);
+        const label = count === 1 ? counter.dataset.labelOne : counter.dataset.labelOther;
+        counter.textContent = count.toLocaleString(document.documentElement.lang || undefined) + ' ' + label;
+    }
+
+    /**
      * Sets up the listener to receive updated data from the editor iframe.
+     * @param {HTMLElement} wrapper - The widget's container element.
      * @param {HTMLIFrameElement} iframe - The editor's iframe.
      * @param {HTMLTextAreaElement} hiddenTextarea - The hidden textarea where data is saved.
      * @param {string} iframeOrigin - The expected origin for messages.
      */
-    function _setupMessageListener(iframe, hiddenTextarea, iframeOrigin) {
+    function _setupMessageListener(wrapper, iframe, hiddenTextarea, iframeOrigin) {
         window.addEventListener('message', function (event) {
             if (event.origin !== iframeOrigin) {
                 return;
@@ -92,6 +170,7 @@
 
             if (event.source === iframe.contentWindow && event.data.type === 'editor-data-update') {
                 hiddenTextarea.value = JSON.stringify(event.data.content);
+                _updateWordCount(wrapper, event.data.content);
             }
         });
     }

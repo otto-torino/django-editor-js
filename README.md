@@ -17,7 +17,7 @@ This library provides a custom `EditorJSField` for your models and a sandboxed i
 -   **Extensible HTML Renderer**: A server-side Python class converts the saved JSON data into clean HTML, with methods for each block type that can be easily extended or overridden.
 -   **Built-in Template Filter**: Render your content with a simple `{% load ... %}` and filter call, no need to write your own rendering logic.
 -   **Sensible Defaults**: Works out-of-the-box with a rich set of common Editor.js tools.
--   **Admin-Friendly UI**: Features include automatic iframe resizing and a fullscreen editing mode for a better user experience.
+-   **Admin-Friendly UI**: Features include automatic iframe resizing, a fullscreen editing mode and a live word count under each editor for a better user experience.
 -   **Baton AI ready**: Zero-config integration with [django-baton](https://github.com/otto-torino/django-baton)'s AI features — translation, summarization and correction work on Editor.js fields (see [Baton AI Integration](#baton-ai-integration)).
 
 ---
@@ -133,6 +133,7 @@ The field will automatically render the iframe widget in the Django admin.
 ### Editor interactions
 
 - **Add vertical space:** open the block menu with the `+` button and choose **Spacer**. Its block settings let you choose a small, medium, or large gap.
+- **Count words:** the number of words of the text is written under the editor and updated while you write. It counts paragraphs, headers, lists, quotes, tables, buttons and captions; code and raw HTML are not counted.
 - **Convert blocks:** select two or more consecutive paragraphs and choose **Bulleted list** or **Numbered list**. When a list block is selected, the same toolbar can switch its list style or convert every item back to a normal paragraph. Inline formatting is preserved.
 
 ### Rendering Content in Templates

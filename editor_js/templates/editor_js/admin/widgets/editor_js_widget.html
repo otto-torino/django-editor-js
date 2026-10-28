@@ -1,4 +1,4 @@
-{% load static %}
+{% load static i18n %}
 {% comment %}
     No inline style or script: the widget Media loads editor_js_widget.css and
     editor_js_widget.js, which initializes the widgets, so that a Content
@@ -24,4 +24,11 @@
         style="width: 100%; border: 1px solid var(--border-color, #ccc); border-radius: 4px;"
     >
     </iframe>
+
+    <div
+        id="id_{{ widget.name }}_word_count"
+        class="editor-js-word-count"
+        data-label-one="{% translate 'word' %}"
+        data-label-other="{% translate 'words' %}"
+    ></div>
 </div>

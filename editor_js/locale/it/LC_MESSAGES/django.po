@@ -20,3 +20,11 @@ msgstr ""
 #: templates/editor_js/editor_js_iframe.html:19
 msgid "Write something..."
 msgstr "Scrivi qualcosa..."
+
+#: templates/editor_js/admin/widgets/editor_js_widget.html:31
+msgid "word"
+msgstr "parola"
+
+#: templates/editor_js/admin/widgets/editor_js_widget.html:32
+msgid "words"
+msgstr "parole"

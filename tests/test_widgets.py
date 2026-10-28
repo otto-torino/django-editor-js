@@ -4,6 +4,7 @@ from pathlib import Path
 import editor_js
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import translation
 
 from editor_js.widgets import EditorJsIframeWidget
 
@@ -110,6 +111,21 @@ class WidgetTest(TestCase):
         self.assertIn('color: var(--body-fg, #333);', css)
         self.assertIn('background-color: var(--darkened-bg, #f0f0f0);', css)
         self.assertNotIn('background-color: #f0f0f0', css)
+
+    def test_render_word_count_with_translated_labels(self):
+        """
+        The widget writes the number of words under the editor, with the
+        labels translated in the language of the page.
+        """
+        widget = EditorJsIframeWidget()
+
+        with translation.override('it'):
+            html = widget.render(name='content', value='', attrs={})
+
+        self.assertIn('id="id_content_word_count"', html)
+        self.assertIn('class="editor-js-word-count"', html)
+        self.assertIn('data-label-one="parola"', html)
+        self.assertIn('data-label-other="parole"', html)
 
 
 class VendorScriptsTest(TestCase):
