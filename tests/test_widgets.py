@@ -114,18 +114,30 @@ class WidgetTest(TestCase):
 
     def test_render_word_count_with_translated_labels(self):
         """
-        The widget writes the number of words under the editor, with the
-        labels translated in the language of the page.
+        The widget writes the number of words and characters under the
+        editor, with the labels translated in the language of the page.
         """
         widget = EditorJsIframeWidget()
 
         with translation.override('it'):
             html = widget.render(name='content', value='', attrs={})
 
+        self.assertIn('id="id_content_footer" class="editor-js-footer"', html)
         self.assertIn('id="id_content_word_count"', html)
         self.assertIn('class="editor-js-word-count"', html)
         self.assertIn('data-label-one="parola"', html)
         self.assertIn('data-label-other="parole"', html)
+        self.assertIn('data-label-character-one="carattere"', html)
+        self.assertIn('data-label-character-other="caratteri"', html)
+
+    def test_word_count_follows_the_dark_mode(self):
+        """
+        The counter takes the quiet color of the admin theme, of Django or of
+        Bootstrap, which changes with the dark mode, instead of a fixed gray.
+        """
+        css_path = Path(editor_js.__file__).parent / 'static/editor_js/css/editor_js_widget.css'
+
+        self.assertIn('color: var(--body-quiet-color, var(--bs-secondary-color, #666));', css_path.read_text())
 
 
 class VendorScriptsTest(TestCase):

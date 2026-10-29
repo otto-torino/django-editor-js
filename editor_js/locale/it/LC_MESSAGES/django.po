@@ -28,3 +28,11 @@ msgstr "parola"
 #: templates/editor_js/admin/widgets/editor_js_widget.html:32
 msgid "words"
 msgstr "parole"
+
+#: templates/editor_js/admin/widgets/editor_js_widget.html:33
+msgid "character"
+msgstr "carattere"
+
+#: templates/editor_js/admin/widgets/editor_js_widget.html:34
+msgid "characters"
+msgstr "caratteri"

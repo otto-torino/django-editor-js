@@ -220,6 +220,20 @@
             const node = icon && icon.jquery ? icon[0] : icon;
             wrapper.parentNode.insertBefore(node, wrapper.nextSibling);
             return true;
+        },
+
+        // the whole widget, so that Baton puts its buttons under the editor,
+        // not between the label and the editor
+        getWidget: function (fieldId) {
+            if (!isEditorJsField(fieldId)) return null;
+            return document.getElementById(fieldId + '_wrapper');
+        },
+
+        // the row under the editor, so that Baton puts its buttons on the
+        // left of the counter, close to the editor
+        getFooter: function (fieldId) {
+            if (!isEditorJsField(fieldId)) return null;
+            return document.getElementById(fieldId + '_footer');
         }
     };
 

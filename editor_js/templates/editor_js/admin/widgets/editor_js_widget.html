@@ -25,10 +25,15 @@
     >
     </iframe>
 
-    <div
-        id="id_{{ widget.name }}_word_count"
-        class="editor-js-word-count"
-        data-label-one="{% translate 'word' %}"
-        data-label-other="{% translate 'words' %}"
-    ></div>
+    {# the counter on the right, the room on the left for the buttons of the admin, e.g. of Baton #}
+    <div id="id_{{ widget.name }}_footer" class="editor-js-footer">
+        <div
+            id="id_{{ widget.name }}_word_count"
+            class="editor-js-word-count"
+            data-label-one="{% translate 'word' %}"
+            data-label-other="{% translate 'words' %}"
+            data-label-character-one="{% translate 'character' %}"
+            data-label-character-other="{% translate 'characters' %}"
+        ></div>
+    </div>
 </div>

@@ -80,13 +80,13 @@
     }
 
     /**
-     * Counts the words a reader reads in Editor.js data: the text of
-     * paragraphs, headers, lists, quotes, tables and buttons, and the
-     * captions, without their markup. Code and raw HTML are not counted.
+     * The texts a reader reads in Editor.js data: the text of paragraphs,
+     * headers, lists, quotes, tables and buttons, and the captions, without
+     * their markup. Code and raw HTML are left out.
      * @param {object} data - The `{blocks: [...]}` object.
-     * @returns {number} The number of words.
+     * @returns {string[]} The plain texts, one per piece of content.
      */
-    function _countWords(data) {
+    function _readTexts(data) {
         const texts = [];
 
         function addListItems(items) {
@@ -128,21 +128,43 @@
 
         // a parsed document has no browsing context: it loads and runs nothing
         const parser = new DOMParser();
-        return texts.reduce(function (count, html) {
-            if (!html) return count;
+        return texts.filter(Boolean).map(function (html) {
             // a line break separates two words, like a space
             const text = parser.parseFromString(
                 String(html).replace(/<br\s*\/?>/gi, ' '), 'text/html'
             ).body.textContent;
+            return text.replace(/\s+/g, ' ').trim();
+        });
+    }
+
+    /**
+     * Counts the words of the texts.
+     * @param {string[]} texts - The plain texts.
+     * @returns {number} The number of words.
+     */
+    function _countWords(texts) {
+        return texts.reduce(function (count, text) {
             // a dash or another sign alone is not a word
-            return count + text.split(/\s+/).filter(function (word) {
+            return count + text.split(' ').filter(function (word) {
                 return /[\p{L}\p{N}]/u.test(word);
             }).length;
         }, 0);
     }
 
     /**
-     * Writes the number of words of the editor under it.
+     * Counts the characters of the texts, spaces included.
+     * @param {string[]} texts - The plain texts.
+     * @returns {number} The number of characters.
+     */
+    function _countCharacters(texts) {
+        return texts.reduce(function (count, text) {
+            // by code points, so an emoji is one character
+            return count + Array.from(text).length;
+        }, 0);
+    }
+
+    /**
+     * Writes the number of words and characters of the editor under it.
      * @param {HTMLElement} wrapper - The widget's container element.
      * @param {object} data - The `{blocks: [...]}` object.
      */
@@ -150,9 +172,16 @@
         const counter = wrapper.querySelector('.editor-js-word-count');
         if (!counter) return;
 
-        const count = _countWords(data);
-        const label = count === 1 ? counter.dataset.labelOne : counter.dataset.labelOther;
-        counter.textContent = count.toLocaleString(document.documentElement.lang || undefined) + ' ' + label;
+        const texts = _readTexts(data);
+        const words = _countWords(texts);
+        const characters = _countCharacters(texts);
+        const lang = document.documentElement.lang || undefined;
+        counter.textContent = [
+            words.toLocaleString(lang) + ' ' + (words === 1 ? counter.dataset.labelOne : counter.dataset.labelOther),
+            characters.toLocaleString(lang) + ' ' + (
+                characters === 1 ? counter.dataset.labelCharacterOne : counter.dataset.labelCharacterOther
+            ),
+        ].join(' · ');
     }
 
     /**
