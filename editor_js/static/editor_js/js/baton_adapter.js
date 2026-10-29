@@ -216,7 +216,9 @@
             if (!isEditorJsField(fieldId)) return false;
             const wrapper = document.getElementById(fieldId + '_wrapper');
             if (!wrapper) return false;
-            wrapper.parentNode.insertBefore(icon, wrapper.nextSibling);
+            // Baton passes a jQuery object, the DOM wants its element
+            const node = icon && icon.jquery ? icon[0] : icon;
+            wrapper.parentNode.insertBefore(node, wrapper.nextSibling);
             return true;
         }
     };
