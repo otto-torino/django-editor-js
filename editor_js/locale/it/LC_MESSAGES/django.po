@@ -36,3 +36,7 @@ msgstr "carattere"
 #: templates/editor_js/admin/widgets/editor_js_widget.html:34
 msgid "characters"
 msgstr "caratteri"
+
+#: editor_js/templates/editor_js/admin/widgets/editor_js_widget.html
+msgid "Editor"
+msgstr "Editor"

@@ -152,3 +152,22 @@ class VendorScriptsTest(TestCase):
             with self.subTest(script=script.name):
                 self.assertNotIn('new Function("return this")', script.read_text())
 
+
+    def test_the_editor_loads_when_it_is_shown(self):
+        """
+        The iframe has the address of the editor in data-src, not in src: the
+        widget script loads it when the iframe is about to be shown, so that a
+        form with many editors, in closed inlines or in the tabs of other
+        languages, does not load them all at once.
+        """
+        widget = EditorJsIframeWidget()
+
+        with translation.override('it'):
+            html = widget.render(name='content', value='', attrs={})
+
+        self.assertIn(f'data-src="{reverse("editor_js_iframe")}"', html)
+        self.assertNotIn(' src="', html)
+        self.assertIn('title="Editor"', html)
+        script = (Path(editor_js.__file__).parent / 'static/editor_js/js/editor_js_widget.js').read_text()
+        self.assertIn('IntersectionObserver', script)
+        self.assertIn('iframe.src = iframe.dataset.src', script)

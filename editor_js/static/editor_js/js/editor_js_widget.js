@@ -37,25 +37,88 @@
         const editorConfig = JSON.parse(configJsonString);
         
         const initialData = hiddenTextarea.value ? JSON.parse(hiddenTextarea.value) : {};
-        const iframeOrigin = new URL(iframe.src).origin;
+        const iframeOrigin = _iframeOrigin(iframe);
 
         _setupFullscreen(wrapper, fullscreenBtn);
         _setupMessageListener(wrapper, iframe, hiddenTextarea, iframeOrigin);
         _updateWordCount(wrapper, initialData);
 
-        if (typeof window.iFrameResize === 'function') {
-            window.iFrameResize({ log: false, checkOrigin: false }, iframe);
-        }
-
         iframe.onload = function () {
+            // an empty iframe loads about:blank too, before it has an editor
+            if (!iframe.getAttribute('src')) return;
+            // the data of the textarea when the editor arrives: setData() may
+            // have changed it while the editor was waiting to be shown
             iframe.contentWindow.postMessage({
                 type: 'init',
                 config: editorConfig,
-                initialData: initialData
+                initialData: _readTextarea(hiddenTextarea)
             }, iframeOrigin);
         };
 
+        _loadWhenShown(iframe);
+
         wrapper.dataset.initialized = 'true';
+    }
+
+    /**
+     * The origin of the editor page, from the address the iframe has or will
+     * have.
+     * @param {HTMLIFrameElement} iframe - The editor's iframe.
+     * @returns {string} The origin.
+     */
+    function _iframeOrigin(iframe) {
+        return new URL(iframe.getAttribute('src') || iframe.dataset.src, window.location.href).origin;
+    }
+
+    /**
+     * The Editor.js data of the hidden textarea.
+     * @param {HTMLTextAreaElement} textarea - The hidden textarea.
+     * @returns {object} The `{blocks: [...]}` object, empty when there is none.
+     */
+    function _readTextarea(textarea) {
+        try {
+            return textarea.value ? JSON.parse(textarea.value) : {};
+        } catch (e) {
+            return {};
+        }
+    }
+
+    /**
+     * Loads the editor in its iframe.
+     * @param {HTMLIFrameElement} iframe - The editor's iframe.
+     */
+    function _load(iframe) {
+        if (iframe.getAttribute('src') || !iframe.dataset.src) return;
+        iframe.src = iframe.dataset.src;
+        if (typeof window.iFrameResize === 'function') {
+            window.iFrameResize({ log: false, checkOrigin: false }, iframe);
+        }
+    }
+
+    // Every editor is a page of its own: a form with many of them, in closed
+    // inlines or in the tabs of other languages, would load them all at once.
+    // Each one loads when it is about to be shown.
+    const _observer = 'IntersectionObserver' in window
+        ? new IntersectionObserver(function (entries, observer) {
+            entries.forEach(function (entry) {
+                if (!entry.isIntersecting) return;
+                observer.unobserve(entry.target);
+                _load(entry.target);
+            });
+        }, { rootMargin: '200px' })
+        : null;
+
+    /**
+     * Loads the editor when its iframe is shown, at once without an
+     * IntersectionObserver.
+     * @param {HTMLIFrameElement} iframe - The editor's iframe.
+     */
+    function _loadWhenShown(iframe) {
+        if (_observer) {
+            _observer.observe(iframe);
+        } else {
+            _load(iframe);
+        }
     }
 
     /**
@@ -269,10 +332,13 @@
             return false;
         }
         textarea.value = JSON.stringify(content);
-        iframe.contentWindow.postMessage(
-            { type: 'set-data', content: content },
-            new URL(iframe.src).origin
-        );
+        // an editor not loaded yet reads the textarea when it arrives
+        if (iframe.getAttribute('src')) {
+            iframe.contentWindow.postMessage(
+                { type: 'set-data', content: content },
+                _iframeOrigin(iframe)
+            );
+        }
         return true;
     };
 

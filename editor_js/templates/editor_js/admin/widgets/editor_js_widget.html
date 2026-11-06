@@ -18,9 +18,11 @@
         <svg id="id_{{ widget.name }}_icon_expand" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
     </button>
     
+    {# no src: the widget script loads the editor when it is shown, see editor_js_widget.js #}
     <iframe 
         id="id_{{ widget.name }}_iframe"
-        src="{{ widget.iframe_src }}"
+        data-src="{{ widget.iframe_src }}"
+        title="{% translate 'Editor' %}"
         style="width: 100%; border: 1px solid var(--border-color, #ccc); border-radius: 4px;"
     >
     </iframe>
