@@ -22,8 +22,18 @@
             return;
         }
 
-        const widgetName = wrapper.dataset.widgetName;
-        
+        // the name of the textarea, which Django renumbers in the copy of the
+        // empty form, while the data attribute keeps "__prefix__"
+        const textarea = wrapper.querySelector('textarea[name]');
+        const widgetName = textarea ? textarea.name : wrapper.dataset.widgetName;
+
+        // the empty form of a formset is only the template of the forms that
+        // "Add another" makes: its copy is initialized when it is added
+        if (widgetName.indexOf('__prefix__') !== -1 || wrapper.closest('.empty-form')) {
+            return;
+        }
+        wrapper.dataset.widgetName = widgetName;
+
         const iframe = wrapper.querySelector(`#id_${widgetName}_iframe`);
         const hiddenTextarea = wrapper.querySelector(`#id_${widgetName}`);
         const fullscreenBtn = wrapper.querySelector(`#id_${widgetName}_fullscreen_btn`);
@@ -58,6 +68,18 @@
         _loadWhenShown(iframe);
 
         wrapper.dataset.initialized = 'true';
+    }
+
+    /**
+     * The value of the hidden textarea for the data of the editor: empty for
+     * a document without blocks, as the widget renders an empty field. An
+     * editor shown and left empty does not change its form then, and an extra
+     * form of a formset is not saved as a new empty record.
+     * @param {object} content - Editor.js data, e.g. `{blocks: [...]}`.
+     * @returns {string} The JSON of the data, or an empty string.
+     */
+    function _textareaValue(content) {
+        return content && content.blocks && content.blocks.length ? JSON.stringify(content) : '';
     }
 
     /**
@@ -261,7 +283,7 @@
             }
 
             if (event.source === iframe.contentWindow && event.data.type === 'editor-data-update') {
-                hiddenTextarea.value = JSON.stringify(event.data.content);
+                hiddenTextarea.value = _textareaValue(event.data.content);
                 _updateWordCount(wrapper, event.data.content);
             }
         });
@@ -277,14 +299,23 @@
     DjangoEditorJSWidget.init = function(selector) {
         document.querySelectorAll(selector).forEach(_initializeInstance);
 
+        // Django 4.1+ dispatches a native event from the new form, with no
+        // arguments for jQuery handlers; a form may have several editors,
+        // one for each language of a translated field
+        document.addEventListener('formset:added', function(event) {
+            if (event.target && typeof event.target.querySelectorAll === 'function') {
+                event.target.querySelectorAll(selector).forEach(_initializeInstance);
+            }
+        });
+
+        // older Django triggers a jQuery event, with the new form as argument
         if (window.django && window.django.jQuery) {
             const $ = window.django.jQuery;
-            $(document).on('formset:added', function(event, $row, formsetName) {
+            $(document).on('formset:added', function(event, $row) {
                 if ($row && typeof $row.find === 'function') {
-                    const $widgetWrapper = $row.find(selector);
-                    if ($widgetWrapper.length) {
-                        _initializeInstance($widgetWrapper[0]);
-                    }
+                    $row.find(selector).each(function () {
+                        _initializeInstance(this);
+                    });
                 }
             });
         }
