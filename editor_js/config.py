@@ -83,6 +83,9 @@ def get_editor_js_config():
         'STORAGE_BACKEND': None,
         'CSS_FILES': ['editor_js/css/editor_js_admin.css',],
         'RENDERER_CLASS': 'editor_js.renderers.EditorJsRenderer',
+        # A callable taking the request, which says whether it may upload
+        # images; None means editor_js.views.can_upload_images (staff only).
+        'IMAGE_UPLOAD_PERMISSION': None,
         'TOOLS': DEFAULT_EDITOR_JS_TOOLS
     }
 

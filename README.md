@@ -72,6 +72,10 @@ This library provides a custom `EditorJSField` for your models and a sandboxed i
         # Specify a custom Python class to render the JSON data to HTML.
         "RENDERER_CLASS": "my_app.renderers.MyCustomRenderer",
     
+        # Who may upload images: a callable taking the request and returning a
+        # boolean. By default only the active staff users may upload.
+        "IMAGE_UPLOAD_PERMISSION": "my_app.permissions.can_upload_images",
+    
         # Configure the tools available to the editor.
         "TOOLS": {
             # Add a new custom tool

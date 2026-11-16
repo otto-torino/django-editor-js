@@ -1,10 +1,13 @@
+import base64
+import importlib.util
 import os
 import re
 import shutil
 from unittest import skipUnless
 
 import django
-from django.test import TestCase, override_settings
+from django.contrib.auth import get_user_model
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
 
@@ -67,53 +70,118 @@ class ViewsTest(TestCase):
         # the tools reading the nonce from the page, like the table one
         self.assertIn(f'<meta property="csp-nonce" content="{nonce}">', html)
 
+    def login(self, **kwargs):
+        user = get_user_model().objects.create_user(
+            'editor', password='password', **{'is_staff': True, **kwargs}
+        )
+        self.client.force_login(user)
+        return user
+
+    def png(self, name='test_image.png'):
+        return SimpleUploadedFile(name, PNG, content_type='image/png')
+
+    def upload(self, image, client=None, **extra):
+        return (client or self.client).post(
+            reverse('editor_js_image_upload'), {'image': image}, **extra
+        )
+
     def test_image_upload_view_get_request(self):
-        """Tests that a GET request to the upload view fails correctly."""
-        url = reverse('editor_js_image_upload')
-        response = self.client.get(url)
+        """Only POST is allowed."""
+        self.login()
+        response = self.client.get(reverse('editor_js_image_upload'))
+        self.assertEqual(response.status_code, 405)
+
+    def test_image_upload_view_refuses_anonymous_users(self):
+        response = self.upload(self.png())
+        self.assertEqual(response.status_code, 403)
+        self.assertJSONEqual(response.content, {
+            'success': 0, 'message': 'You are not allowed to upload images.'
+        })
+        self.assertFalse(os.path.exists(os.path.join(TEST_MEDIA_ROOT, 'editor_js')))
+
+    def test_image_upload_view_refuses_users_out_of_the_staff(self):
+        self.login(is_staff=False)
+        self.assertEqual(self.upload(self.png()).status_code, 403)
+
+    def test_image_upload_view_refuses_inactive_staff_users(self):
+        user = self.login()
+        user.is_active = False
+        user.save()
+        self.assertEqual(self.upload(self.png()).status_code, 403)
+
+    @override_settings(EDITOR_JS={'IMAGE_UPLOAD_PERMISSION': 'tests.test_views.anyone'})
+    def test_image_upload_permission_can_be_configured(self):
+        self.assertEqual(self.upload(self.png()).status_code, 200)
+
+    def test_image_upload_view_requires_the_csrf_token(self):
+        client = Client(enforce_csrf_checks=True)
+        client.force_login(self.login())
+        client.get(reverse('editor_js_iframe'))
+        token = client.cookies['csrftoken'].value
+
+        self.assertEqual(self.upload(self.png(), client=client).status_code, 403)
+        response = self.upload(self.png(), client=client, HTTP_X_CSRFTOKEN=token)
         self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(response.content, {'success': 0, 'message': 'Invalid request method or no image provided.'})
 
     def test_image_upload_view_post_no_file(self):
-        """
-        Tests that a POST request without a file fails.
-        """
-        url = reverse('editor_js_image_upload')
-        response = self.client.post(url, {})
-        self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(response.content, {'success': 0, 'message': 'Invalid request method or no image provided.'})
+        """A POST without a file fails."""
+        self.login()
+        response = self.client.post(reverse('editor_js_image_upload'), {})
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(response.content, {'success': 0, 'message': 'No image provided.'})
 
     def test_image_upload_view_post_invalid_file_type(self):
-        """
-        Tests that uploading a disallowed file type fails.
-        """
-        url = reverse('editor_js_image_upload')
+        """A disallowed content type fails."""
+        self.login()
         invalid_file = SimpleUploadedFile("test.txt", b"file_content", content_type="text/plain")
-        
-        response = self.client.post(url, {'image': invalid_file})
-        
-        self.assertEqual(response.status_code, 200)
+        response = self.upload(invalid_file)
+        self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(response.content, {
             'success': 0,
             'message': 'Invalid file type: text/plain.'
         })
 
+    def test_image_upload_view_refuses_a_file_that_is_not_an_image(self):
+        """The content type comes from the client: the bytes are checked."""
+        self.login()
+        fake = SimpleUploadedFile(
+            "page.jpg", b"<html><script>alert(1)</script></html>", content_type="image/jpeg"
+        )
+        response = self.upload(fake)
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(response.content, {'success': 0, 'message': 'Invalid image file.'})
+
+    @skipUnless(importlib.util.find_spec('PIL'), "Pillow is not installed")
+    def test_image_upload_view_refuses_a_broken_image_when_pillow_is_installed(self):
+        self.login()
+        broken = SimpleUploadedFile("broken.png", PNG[:16] + b"broken", content_type="image/png")
+        self.assertEqual(self.upload(broken).status_code, 400)
+
     def test_image_upload_view_post_success(self):
-        """
-        Tests successful image upload ("happy path").
-        """
-        url = reverse('editor_js_image_upload')
-        image = SimpleUploadedFile("test_image.jpg", b"image_content", content_type="image/jpeg")
-        
-        response = self.client.post(url, {'image': image})
-        
+        """A staff user uploads an image ("happy path")."""
+        self.login()
+        response = self.upload(self.png())
+
         self.assertEqual(response.status_code, 200)
-        
-        response_json = response.json()
-        self.assertEqual(response_json['success'], 1)
-        self.assertIn('file', response_json)
-        self.assertIn('url', response_json['file'])
-        
-        file_url = response_json['file']['url']
+        file_url = response.json()['file']['url']
+        self.assertEqual(response.json()['success'], 1)
         self.assertTrue(file_url.startswith('/media/editor_js/'))
-        self.assertTrue(file_url.endswith('.jpg'))
+        self.assertTrue(file_url.endswith('.png'))
+
+    def test_image_upload_view_saves_the_extension_of_the_format(self):
+        """An image named as a page is not served as a page."""
+        self.login()
+        response = self.upload(self.png('page.html'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()['file']['url'].endswith('/editor_js/page.png'))
+
+
+def anyone(request):
+    return True
+
+
+# a valid 1x1 PNG
+PNG = base64.b64decode(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
+)

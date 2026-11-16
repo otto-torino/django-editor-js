@@ -15,6 +15,10 @@ You can customize the library by adding an ``EDITOR_JS`` dictionary to your ``se
         
         # Specify a custom Python class to render the JSON data to HTML.
         "RENDERER_CLASS": "my_app.renderers.MyCustomRenderer",
+
+        # Who may upload images: a callable taking the request and returning a
+        # boolean. By default only the active staff users may upload.
+        "IMAGE_UPLOAD_PERMISSION": "my_app.permissions.can_upload_images",
         
         # Configure the tools available to the editor.
         "TOOLS": {
@@ -31,3 +35,13 @@ You can customize the library by adding an ``EDITOR_JS`` dictionary to your ``se
             'quote': None,
         }
     }
+
+Image uploads
+-------------
+
+The image tool posts its files to the ``editor_js_image_upload`` view, which:
+
+- accepts only ``POST`` requests carrying the CSRF token (the editor sends it in the ``X-CSRFToken`` header);
+- accepts only the users allowed by ``IMAGE_UPLOAD_PERMISSION``, the active staff users by default (``editor_js.views.can_upload_images``);
+- accepts only JPEG, PNG, GIF and WebP images, recognised from the bytes of the file (and read whole by Pillow when it is installed), not from the content type or the name sent by the client;
+- saves each image under ``editor_js/`` in the configured storage, with the extension of its format.
