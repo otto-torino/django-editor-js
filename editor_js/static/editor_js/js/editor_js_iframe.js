@@ -181,6 +181,32 @@
     }
 
     /**
+     * Keeps the + and the ⋮⋮ of the blocks inside the iframe. Editor.js puts
+     * them on the left of the content, which is centered and 650px wide at
+     * most: with less room than them on the left, they go out of the iframe,
+     * and nobody can add a block. Its "narrow" mode puts them on the right,
+     * inside, but Editor.js turns it on only when the content does not fit,
+     * and only when it starts, while the admin may be resized. So the mode is
+     * on whenever the buttons do not fit on the left, at every resize.
+     */
+    function _setupNarrowMode() {
+        const wrapper = document.querySelector('.codex-editor');
+        if (!wrapper || typeof ResizeObserver !== 'function') return;
+
+        const update = () => {
+            const actions = wrapper.querySelector('.ce-toolbar__actions');
+            const content = wrapper.querySelector('.ce-block__content');
+            if (!actions || !content) return;
+            const contentWidth = parseFloat(getComputedStyle(content).maxWidth) || 650;
+            const roomOnTheLeft = (wrapper.offsetWidth - contentWidth) / 2;
+            wrapper.classList.toggle('codex-editor--narrow', roomOnTheLeft < actions.offsetWidth);
+        };
+        // the mode changes the margins of the blocks, not the width observed
+        new ResizeObserver(update).observe(wrapper);
+        update();
+    }
+
+    /**
      * A text of the iframe around the editor, in the language of the page.
      */
     function _t(text) {
@@ -457,6 +483,7 @@
                 console.log('[DEBUG] 7. Editor.js is ready.');
                 _setupBulkListConversion(Boolean(tools.list));
                 _setupPopoverFitting();
+                _setupNarrowMode();
                 // the blocks move by dragging their ⋮⋮ handle (editorjs-drag-drop)
                 if (typeof window.DragDrop === 'function') {
                     new window.DragDrop(_editorInstance);
