@@ -74,11 +74,96 @@ class RendererTest(TestCase):
         renderer = EditorJsRenderer(data)
         html = renderer.render()
         expected_html = (
-            '<div style="text-align: center;">'
+            '<div class="editor-js-buttons editor-js-buttons--grouped" '
+            'style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;">'
             '<a href="https://example.com" class="btn btn-primary">Click me</a>'
             '</div>'
         )
         self.assertEqual(html, expected_html)
+
+    def test_render_button_row(self):
+        data = {
+            "blocks": [
+                {
+                    "type": "button",
+                    "data": {
+                        "alignment": "right",
+                        "buttons": [
+                            {"text": "Discover", "url": "/a", "btnColor": "btn-primary"},
+                            {"text": "Contact", "url": "/b", "btnColor": "btn-secondary"},
+                        ],
+                    }
+                }
+            ]
+        }
+        html = EditorJsRenderer(data).render()
+        expected_html = (
+            '<div class="editor-js-buttons editor-js-buttons--grouped" '
+            'style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: flex-end;">'
+            '<a href="/a" class="btn btn-primary">Discover</a>'
+            '<a href="/b" class="btn btn-secondary">Contact</a>'
+            '</div>'
+        )
+        self.assertEqual(html, expected_html)
+
+    def _render_row(self, **layout):
+        data = {"buttons": [{"text": "A", "url": "/a"}, {"text": "B", "url": "/b"}], **layout}
+        return EditorJsRenderer({"blocks": [{"type": "button", "data": data}]}).render()
+
+    def test_render_button_row_spread(self):
+        """Spread puts the first and last button at the edges, whatever the alignment."""
+        html = self._render_row(distribution="spread", alignment="center", gap="large")
+        self.assertIn('class="editor-js-buttons editor-js-buttons--spread"', html)
+        self.assertIn("gap: 2rem; justify-content: space-between;", html)
+        # below 36rem of row the buttons stack, full width
+        self.assertEqual(
+            html.count('style="flex: 0 1 calc((36rem - 100%) * 999); min-width: fit-content;"'), 2
+        )
+
+    def test_render_button_row_fill(self):
+        """Fill gives every button the same share of the row."""
+        html = self._render_row(distribution="fill", gap="medium")
+        self.assertIn('class="editor-js-buttons editor-js-buttons--fill"', html)
+        self.assertIn("gap: 1rem;", html)
+        self.assertEqual(html.count('style="flex: 1 1 0; min-width: fit-content;"'), 2)
+
+    def test_render_button_row_unknown_layout_values_fall_back(self):
+        """Layout values go into a style attribute: unknown ones are not written."""
+        html = self._render_row(
+            distribution='x" onclick="evil()',
+            alignment="left; background: url(evil)",
+            gap="99px",
+        )
+        self.assertIn('class="editor-js-buttons editor-js-buttons--grouped"', html)
+        self.assertIn("gap: 0.5rem; justify-content: flex-start;", html)
+        self.assertNotIn("evil", html)
+        self.assertNotIn("99px", html)
+
+    def test_render_button_row_escapes_each_button(self):
+        data = {
+            "blocks": [
+                {
+                    "type": "button",
+                    "data": {
+                        "buttons": [
+                            {"text": "<b>x</b>", "url": '/a"b', "btnColor": 'c"d'},
+                        ],
+                    }
+                }
+            ]
+        }
+        html = EditorJsRenderer(data).render()
+        self.assertEqual(
+            html,
+            '<div class="editor-js-buttons editor-js-buttons--grouped" '
+            'style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: flex-start;">'
+            '<a href="/a&quot;b" class="btn c&quot;d">&lt;b&gt;x&lt;/b&gt;</a>'
+            '</div>'
+        )
+
+    def test_render_button_row_without_buttons(self):
+        data = {"blocks": [{"type": "button", "data": {"buttons": []}}]}
+        self.assertEqual(EditorJsRenderer(data).render(), "")
 
     def test_render_unknown_block(self):
         data = {
@@ -283,18 +368,22 @@ class RendererTest(TestCase):
         ]
         for url in unsafe_urls:
             with self.subTest(url=url):
-                data = {"blocks": [{"type": "button", "data": {"text": "Go", "url": url}}]}
-                self.assertIn('<a href="#" ', EditorJsRenderer(data).render())
+                for data in (
+                    {"buttons": [{"text": "Go", "url": url}]},
+                    {"text": "Go", "url": url},  # saved before rows
+                ):
+                    html = EditorJsRenderer({"blocks": [{"type": "button", "data": data}]}).render()
+                    self.assertIn('<a href="#" ', html)
 
     def test_button_safe_urls_are_kept(self):
         for url in ("https://example.com/a", "/page", "mailto:a@example.com", "#top", "tel:123"):
             with self.subTest(url=url):
-                data = {"blocks": [{"type": "button", "data": {"text": "Go", "url": url}}]}
+                data = {"blocks": [{"type": "button", "data": {"buttons": [{"text": "Go", "url": url}]}}]}
                 self.assertIn(f'<a href="{url}" ', EditorJsRenderer(data).render())
 
     def test_button_url_is_not_filtered_when_not_safe(self):
         """With safe=False the content is trusted and left as it is."""
-        data = {"blocks": [{"type": "button", "data": {"text": "Go", "url": "javascript:go()"}}]}
+        data = {"blocks": [{"type": "button", "data": {"buttons": [{"text": "Go", "url": "javascript:go()"}]}}]}
         self.assertIn('<a href="javascript:go()" ', EditorJsRenderer(data, safe=False).render())
 
     def test_inline_highlight_and_font_size_are_preserved(self):

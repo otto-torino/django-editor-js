@@ -1,3 +1,23 @@
+/**
+ * A row of buttons. Its data is `{alignment, distribution, gap, buttons:
+ * [{text, url, btnColor}]}`; a block saved before rows existed holds one
+ * button in `{text, url, btnColor, alignment}` and is read as a row of one.
+ *
+ * distribution: "grouped" (side by side, placed by alignment), "spread"
+ * (first and last button at the edges) or "fill" (equal widths filling the
+ * row). gap: "small", "medium" or "large". The renderer in renderers.py
+ * draws the row the same way.
+ */
+const BUTTON_JUSTIFY = { left: 'flex-start', center: 'center', right: 'flex-end' };
+const BUTTON_GAPS = { small: '0.5rem', medium: '1rem', large: '2rem' };
+const BUTTON_DISTRIBUTIONS = ['grouped', 'spread', 'fill'];
+// The style of each button of a row, as BUTTON_STYLES in renderers.py.
+const BUTTON_STYLES = {
+    grouped: {},
+    fill: { flex: '1 1 0', minWidth: 'fit-content' },
+    spread: { flex: '0 1 calc((36rem - 100%) * 999)', minWidth: 'fit-content' }
+};
+
 class ButtonTool {
     static get toolbox() {
         return {
@@ -9,143 +29,275 @@ class ButtonTool {
     constructor({ data, api, block }) {
         this.api = api;
         this.block = block;
+
+        const buttons = Array.isArray(data.buttons) ? data.buttons : [data];
         this.data = {
-            text: data.text || 'Click me',
-            url: data.url || '',
-            btnColor: data.btnColor || 'btn-primary',
-            alignment: data.alignment || 'left'
+            alignment: ButtonTool._pick(data.alignment, Object.keys(BUTTON_JUSTIFY), 'left'),
+            distribution: ButtonTool._pick(data.distribution, BUTTON_DISTRIBUTIONS, 'grouped'),
+            gap: ButtonTool._pick(data.gap, Object.keys(BUTTON_GAPS), 'small'),
+            buttons: buttons.map((button) => ButtonTool._newButton(button))
         };
+        if (!this.data.buttons.length) {
+            this.data.buttons.push(ButtonTool._newButton());
+        }
 
         this.wrapper = null;
-        this.preview = null;
+        this.row = null;
         this.missingUrlHint = null;
-        this.urlInput = null;
+        this.settingsContainer = null;
+        this.urlInputs = [];
+    }
+
+    static _pick(value, allowed, fallback) {
+        return allowed.includes(value) ? value : fallback;
+    }
+
+    static _newButton(button = {}) {
+        return {
+            text: button.text || 'Click me',
+            url: button.url || '',
+            btnColor: button.btnColor || 'btn-primary'
+        };
+    }
+
+    static _isComplete(button) {
+        return Boolean(button.text.trim() && button.url.trim());
     }
 
     render() {
         this.wrapper = document.createElement('div');
-        this.preview = this._createPreview();
-        
-        this.wrapper.style.textAlign = this.data.alignment;
+
+        this.row = document.createElement('div');
+        this.row.className = 'button-row';
+        this.row.style.display = 'flex';
+        this.row.style.flexWrap = 'wrap';
 
         this.missingUrlHint = document.createElement('div');
         this.missingUrlHint.className = 'button-missing-url-hint';
-        this.missingUrlHint.innerText = 'Add a URL in the block settings, or this button will not be saved.';
+        this.missingUrlHint.innerText = 'Add a URL to every button in the block settings: a button without one will not be saved.';
 
-        this.wrapper.appendChild(this.preview);
+        this.wrapper.appendChild(this.row);
         this.wrapper.appendChild(this.missingUrlHint);
+        this._updatePreview();
         this._updateMissingUrlState();
         return this.wrapper;
     }
 
     renderSettings() {
-        const settingsContainer = document.createElement('div');
-        const iconText = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 6.1H3"/><path d="M21 12.1H3"/><path d="M15.1 18.1H3"/></svg>';
-        const iconLink = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"/></svg>';
-        
-        const textInput = this._createSettingInput({
-            icon: iconText,
-            placeholder: 'Click me',
-            value: this.data.text,
-            onInput: (value) => {
-                this.data.text = value;
-                this._updatePreview();
-            }
-        });
-
-        const urlInput = this._createSettingInput({
-            icon: iconLink,
-            placeholder: 'https://example.com',
-            value: this.data.url,
-            onInput: (value) => {
-                this.data.url = value;
-                this._updateMissingUrlState();
-            }
-        });
-        urlInput.style.marginTop = '10px';
-        this.urlInput = urlInput.querySelector('input');
-        this._updateMissingUrlState();
-
-        const colorButtonsWrapper = document.createElement('div');
-        colorButtonsWrapper.style.display = 'flex';
-        colorButtonsWrapper.style.gap = '8px';
-        colorButtonsWrapper.style.marginTop = '10px';
-        
-        const colors = [
-            { name: 'Primary', value: 'btn-primary' },
-            { name: 'Secondary', value: 'btn-secondary' }
-        ];
-
-        colors.forEach(color => {
-            const button = this._createStyleButton(color.name, `color-${color.value}`, () => {
-                this.data.btnColor = color.value;
-                this._updatePreview();
-                this._updateActiveButtons(settingsContainer);
-            });
-            colorButtonsWrapper.appendChild(button);
-        });
-
-        const alignButtonsWrapper = document.createElement('div');
-        alignButtonsWrapper.style.display = 'flex';
-        alignButtonsWrapper.style.gap = '8px';
-        alignButtonsWrapper.style.marginTop = '8px';
-        
-        const alignments = [
-            { name: 'left', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="17" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="3" y2="18"/></svg>' },
-            { name: 'center', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="10" x2="6" y2="10"/><line x1="21" y1="6" x2="3"y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="18" y1="18" x2="6" y2="18"/></svg>' },
-            { name: 'right', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="10" x2="7" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="7" y2="14"/><line x1="21" y1="18" x2="3" y2="18"/></svg>' }
-        ];
-        
-        alignments.forEach(align => {
-            const button = this._createStyleButton(align.icon, `align-${align.name}`, () => {
-                this.data.alignment = align.name;
-                this._updatePreview();
-                this._updateActiveButtons(settingsContainer);
-            });
-            alignButtonsWrapper.appendChild(button);
-        });
-
-        settingsContainer.appendChild(textInput);
-        settingsContainer.appendChild(urlInput);
-        settingsContainer.appendChild(colorButtonsWrapper);
-        settingsContainer.appendChild(alignButtonsWrapper);
-        
-        this._updateActiveButtons(settingsContainer);
-
-        return settingsContainer;
+        this.settingsContainer = document.createElement('div');
+        this._fillSettings();
+        return this.settingsContainer;
     }
-    
+
     save() {
-        return this.data;
+        // A button without text or url is left out, as a block without them
+        // was before rows existed.
+        return {
+            alignment: this.data.alignment,
+            distribution: this.data.distribution,
+            gap: this.data.gap,
+            buttons: this.data.buttons
+                .filter((button) => ButtonTool._isComplete(button))
+                .map((button) => ({ ...button }))
+        };
     }
 
     validate(savedData) {
-        return savedData.text.trim() && savedData.url.trim();
+        return savedData.buttons.length > 0;
     }
 
-    _createPreview() {
-        const previewElement = document.createElement('div');
-        previewElement.innerText = this.data.text;
-        previewElement.className = 'btn';
-        previewElement.classList.add(this.data.btnColor);
-        return previewElement;
+    _fillSettings() {
+        const container = this.settingsContainer;
+        if (!container) return;
+        container.innerHTML = '';
+        this.urlInputs = [];
+
+        const iconText = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 6.1H3"/><path d="M21 12.1H3"/><path d="M15.1 18.1H3"/></svg>';
+        const iconLink = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"/></svg>';
+        const several = this.data.buttons.length > 1;
+
+        this.data.buttons.forEach((button, index) => {
+            const item = document.createElement('div');
+            item.className = 'button-settings-item';
+
+            if (several) {
+                const title = document.createElement('div');
+                title.className = 'button-settings-item-title';
+                title.innerText = `Button ${index + 1}`;
+                item.appendChild(title);
+            }
+
+            item.appendChild(this._createSettingInput({
+                icon: iconText,
+                placeholder: 'Click me',
+                value: button.text,
+                onInput: (value) => {
+                    button.text = value;
+                    this._updatePreview();
+                }
+            }));
+
+            const urlInput = this._createSettingInput({
+                icon: iconLink,
+                placeholder: 'https://example.com',
+                value: button.url,
+                onInput: (value) => {
+                    button.url = value;
+                    this._updateMissingUrlState();
+                }
+            });
+            this.urlInputs.push(urlInput.querySelector('input'));
+            item.appendChild(urlInput);
+
+            const actions = document.createElement('div');
+            actions.className = 'button-settings-actions';
+            const colors = [
+                { name: 'Primary', value: 'btn-primary' },
+                { name: 'Secondary', value: 'btn-secondary' }
+            ];
+            const colorButtons = [];
+            colors.forEach((color) => {
+                const colorButton = this._createStyleButton(color.name, () => {
+                    button.btnColor = color.value;
+                    this._updatePreview();
+                    this._setActive(colorButtons, colorButton);
+                });
+                colorButtons.push(colorButton);
+                if (button.btnColor === color.value) this._setActive([colorButton], colorButton);
+                actions.appendChild(colorButton);
+            });
+
+            if (several) {
+                actions.appendChild(this._createStyleButton('Remove', () => {
+                    this.data.buttons.splice(this.data.buttons.indexOf(button), 1);
+                    this._buttonsChanged();
+                }, 'button-settings-remove'));
+            }
+
+            item.appendChild(actions);
+            container.appendChild(item);
+        });
+
+        const addButton = this._createStyleButton('+ Add button', () => {
+            this.data.buttons.push(ButtonTool._newButton());
+            this._buttonsChanged();
+        }, 'button-settings-add');
+        container.appendChild(addButton);
+
+        container.appendChild(this._createSettingsTitle('Layout'));
+
+        // the alignment places a grouped row only: the other layouts use the
+        // whole width
+        const alignButtonsWrapper = document.createElement('div');
+        alignButtonsWrapper.className = 'button-settings-actions';
+        alignButtonsWrapper.hidden = this.data.distribution !== 'grouped';
+
+        container.appendChild(this._createChoiceRow(
+            [
+                { value: 'grouped', label: 'Grouped' },
+                { value: 'spread', label: 'Spread' },
+                { value: 'fill', label: 'Fill' }
+            ],
+            this.data.distribution,
+            (value) => {
+                this.data.distribution = value;
+                alignButtonsWrapper.hidden = value !== 'grouped';
+            }
+        ));
+
+        const alignments = [
+            { name: 'left', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="17" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="3" y2="18"/></svg>' },
+            { name: 'center', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="10" x2="6" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="18" y1="18" x2="6" y2="18"/></svg>' },
+            { name: 'right', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="10" x2="7" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="7" y2="14"/><line x1="21" y1="18" x2="3" y2="18"/></svg>' }
+        ];
+        const alignButtons = [];
+        alignments.forEach((align) => {
+            const alignButton = this._createStyleButton(align.icon, () => {
+                this.data.alignment = align.name;
+                this._updatePreview();
+                this._setActive(alignButtons, alignButton);
+            });
+            alignButtons.push(alignButton);
+            if (this.data.alignment === align.name) this._setActive([alignButton], alignButton);
+            alignButtonsWrapper.appendChild(alignButton);
+        });
+        container.appendChild(alignButtonsWrapper);
+
+        container.appendChild(this._createSettingsTitle('Spacing'));
+        container.appendChild(this._createChoiceRow(
+            [
+                { value: 'small', label: 'Small' },
+                { value: 'medium', label: 'Medium' },
+                { value: 'large', label: 'Large' }
+            ],
+            this.data.gap,
+            (value) => { this.data.gap = value; }
+        ));
+
+        this._updateMissingUrlState();
+    }
+
+    _createSettingsTitle(text) {
+        const title = document.createElement('div');
+        title.className = 'button-settings-item-title button-settings-row-title';
+        title.innerText = text;
+        return title;
+    }
+
+    // A row of settings buttons of which one is active at a time.
+    _createChoiceRow(choices, current, onChoose) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'button-settings-actions';
+        const buttons = [];
+        choices.forEach((choice) => {
+            const button = this._createStyleButton(choice.label, () => {
+                onChoose(choice.value);
+                this._updatePreview();
+                this._setActive(buttons, button);
+            });
+            buttons.push(button);
+            if (choice.value === current) this._setActive([button], button);
+            wrapper.appendChild(button);
+        });
+        return wrapper;
+    }
+
+    // Adding or removing a button rebuilds the settings. It waits for the
+    // click to end: a clicked element taken out of the page reads to Editor.js
+    // as a click outside of it, which closes the settings.
+    _buttonsChanged() {
+        this._updatePreview();
+        this._updateMissingUrlState();
+        this._dispatchChange();
+        setTimeout(() => this._fillSettings(), 0);
     }
 
     _updatePreview() {
-        if (this.preview) {
-            this.preview.innerText = this.data.text;
-            this.preview.className = 'btn';
-            this.preview.classList.add(this.data.btnColor);
-            
-            this.wrapper.style.textAlign = this.data.alignment;
-        }
+        if (!this.row) return;
+        const buttonStyle = BUTTON_STYLES[this.data.distribution];
+        this.row.style.gap = BUTTON_GAPS[this.data.gap];
+        this.row.style.justifyContent = this.data.distribution === 'spread'
+            ? 'space-between'
+            : BUTTON_JUSTIFY[this.data.alignment];
+        this.row.innerHTML = '';
+        this.data.buttons.forEach((button) => {
+            const preview = document.createElement('div');
+            preview.className = 'btn';
+            preview.classList.add(button.btnColor);
+            preview.innerText = button.text;
+            Object.assign(preview.style, buttonStyle);
+            this.row.appendChild(preview);
+        });
     }
 
-    // validate() drops a button without url on save: flag it while editing.
+    // save() leaves out a button without url: flag it while editing.
     _updateMissingUrlState() {
-        const missing = !this.data.url.trim();
+        const missing = this.data.buttons.some((button) => !button.url.trim());
         if (this.missingUrlHint) this.missingUrlHint.hidden = !missing;
-        if (this.urlInput) this.urlInput.classList.toggle('button-settings-input-invalid', missing);
+        this.urlInputs.forEach((input, index) => {
+            const button = this.data.buttons[index];
+            input.classList.toggle('button-settings-input-invalid', Boolean(button) && !button.url.trim());
+        });
     }
 
     _createSettingInput({ icon, placeholder, value, onInput }) {
@@ -166,36 +318,31 @@ class ButtonTool {
         wrapper.appendChild(input);
         return wrapper;
     }
-    
-    _createStyleButton(innerHTML, dataValue, onClick) {
+
+    _createStyleButton(innerHTML, onClick, extraClass) {
         const button = document.createElement('button');
+        button.type = 'button';
         button.classList.add(this.api.styles.settingsButton);
+        if (extraClass) button.classList.add(extraClass);
         button.innerHTML = innerHTML;
-        button.dataset.value = dataValue;
-        button.addEventListener('click', () => {
+        button.onclick = () => {
             onClick();
             this._dispatchChange();
-        });
+        };
         return button;
+    }
+
+    _setActive(buttons, active) {
+        buttons.forEach((button) => {
+            button.classList.toggle(this.api.styles.settingsButtonActive, button === active);
+        });
     }
 
     // The settings inputs live outside the block, so Editor.js does not see
     // their edits: notify it, or the saved data keeps the old values (and a
-    // button saved without url is dropped by validate()).
+    // button saved without url is left out by save()).
     _dispatchChange() {
         if (this.block) this.block.dispatchChange();
-    }
-
-    _updateActiveButtons(container) {
-        const buttons = container.querySelectorAll('button');
-        buttons.forEach(button => {
-            const value = button.dataset.value;
-            if (value.startsWith('align-')) {
-                button.classList.toggle(this.api.styles.settingsButtonActive, value === `align-${this.data.alignment}`);
-            } else if (value.startsWith('color-')) {
-                button.classList.toggle(this.api.styles.settingsButtonActive, value === `color-${this.data.btnColor}`);
-            }
-        });
     }
 }
 

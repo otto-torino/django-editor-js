@@ -350,6 +350,43 @@ tr:nth-child(even) {
     font-size: 13px;
 }
 
+.button-settings-item {
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.button-settings-item-title {
+    margin-bottom: 6px;
+    font-family: sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.button-settings-row-title {
+    margin-top: 12px;
+    margin-bottom: 0;
+}
+
+.button-settings-actions[hidden] {
+    display: none;
+}
+
+.button-settings-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.button-settings-remove {
+    margin-left: auto;
+    color: #dc3545;
+}
+
+.button-settings-add {
+    width: 100%;
+}
+
 .button-settings-colors {
     display: flex;
     gap: 8px;

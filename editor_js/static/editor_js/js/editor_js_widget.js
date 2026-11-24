@@ -190,8 +190,13 @@
             switch (block.type) {
                 case 'paragraph':
                 case 'header':
-                case 'button':
                     texts.push(blockData.text);
+                    break;
+                case 'button':
+                    // a row of buttons, or a single button saved before rows
+                    (blockData.buttons || [blockData]).forEach(function (button) {
+                        texts.push(button && button.text);
+                    });
                     break;
                 case 'list':
                     addListItems(blockData.items);

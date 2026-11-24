@@ -221,19 +221,65 @@ class EditorJsRenderer:
             </figure>
         """
     
+    BUTTON_JUSTIFY = {"left": "flex-start", "center": "center", "right": "flex-end"}
+    BUTTON_GAPS = {"small": "0.5rem", "medium": "1rem", "large": "2rem"}
+    # The style of each button of a row, by distribution. "fit-content" keeps
+    # a button as wide as its text, so a row that does not fit wraps whole
+    # buttons rather than their text.
+    BUTTON_STYLES = {
+        "grouped": "",
+        # Equal widths: every button grows from no width at all.
+        "fill": "flex: 1 1 0; min-width: fit-content;",
+        # Below 36rem of row the basis turns huge and every button takes a
+        # line of its own, full width; above it turns 0 and the buttons keep
+        # the width of their text, spread by the row.
+        "spread": "flex: 0 1 calc((36rem - 100%) * 999); min-width: fit-content;",
+    }
+
     def render_button(self, data):
-        text = self.escape(data.get("text", ""))
-        url = data.get("url", "#")
-        # As for the links in the text: a button must not run script.
-        if self.safe and _is_unsafe_url(url):
-            url = "#"
-        url = self.escape(url)
-        css_class = self.escape(data.get("btnColor", "btn-secondary"))
-        alignment = self.escape(data.get("alignment", "left"))
+        # A button block holds a row of buttons in "buttons"; blocks saved
+        # before that hold a single button in "text", "url" and "btnColor".
+        buttons = data.get("buttons")
+        if buttons is None:
+            buttons = [data]
+        if not buttons:
+            return ""
 
-        button_html = f'<a href="{url}" class="btn {css_class}">{text}</a>'
+        # The layout values go into a style attribute: only known ones pass.
+        alignment = data.get("alignment", "left")
+        if alignment not in self.BUTTON_JUSTIFY:
+            alignment = "left"
+        distribution = data.get("distribution", "grouped")
+        if distribution not in self.BUTTON_STYLES:
+            distribution = "grouped"
+        gap = data.get("gap", "small")
+        if gap not in self.BUTTON_GAPS:
+            gap = "small"
 
-        return f'<div style="text-align: {alignment};">{button_html}</div>'
+        if distribution == "spread":
+            justify = "space-between"
+        else:
+            justify = self.BUTTON_JUSTIFY[alignment]
+        style = self.BUTTON_STYLES[distribution]
+        button_style = f' style="{style}"' if style else ""
+
+        buttons_html = []
+        for button in buttons:
+            text = self.escape(button.get("text", ""))
+            url = button.get("url", "#")
+            # As for the links in the text: a button must not run script.
+            if self.safe and _is_unsafe_url(url):
+                url = "#"
+            url = self.escape(url)
+            css_class = self.escape(button.get("btnColor", "btn-secondary"))
+            buttons_html.append(f'<a href="{url}" class="btn {css_class}"{button_style}>{text}</a>')
+
+        # A row that does not fit wraps onto more lines.
+        return (
+            f'<div class="editor-js-buttons editor-js-buttons--{distribution}" '
+            f'style="display: flex; flex-wrap: wrap; gap: {self.BUTTON_GAPS[gap]}; '
+            f'justify-content: {justify};">{"".join(buttons_html)}</div>'
+        )
     
     def render_divider(self, data):
         return '<hr>'
