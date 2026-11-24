@@ -154,6 +154,8 @@
             bottom = Math.max(bottom, menu.getBoundingClientRect().bottom + window.scrollY);
         });
         const minHeight = bottom ? Math.ceil(bottom) + 16 + 'px' : '';
+        // with no menu open, the narrow mode can follow the width again
+        if (!bottom) _updateNarrowMode();
         if (document.body.style.minHeight === minHeight) return;
         document.body.style.minHeight = minHeight;
         if (window.parentIFrame) window.parentIFrame.size();
@@ -192,18 +194,31 @@
     function _setupNarrowMode() {
         const wrapper = document.querySelector('.codex-editor');
         if (!wrapper || typeof ResizeObserver !== 'function') return;
-
-        const update = () => {
-            const actions = wrapper.querySelector('.ce-toolbar__actions');
-            const content = wrapper.querySelector('.ce-block__content');
-            if (!actions || !content) return;
-            const contentWidth = parseFloat(getComputedStyle(content).maxWidth) || 650;
-            const roomOnTheLeft = (wrapper.offsetWidth - contentWidth) / 2;
-            wrapper.classList.toggle('codex-editor--narrow', roomOnTheLeft < actions.offsetWidth);
-        };
         // the mode changes the margins of the blocks, not the width observed
-        new ResizeObserver(update).observe(wrapper);
-        update();
+        new ResizeObserver(_updateNarrowMode).observe(wrapper);
+        _updateNarrowMode();
+    }
+
+    function _updateNarrowMode() {
+        const wrapper = document.querySelector('.codex-editor');
+        const content = wrapper && wrapper.querySelector('.ce-block__content');
+        if (!content) return;
+        // An open menu was placed on the side of the buttons: moving them
+        // would leave it out of the iframe. The closing of a menu calls this
+        // again, from _fitOpenPopover.
+        if (document.querySelector('.ce-popover--opened')) return;
+
+        // The width of the + and the ⋮⋮ from the size Editor.js gives them:
+        // the elements are not displayed while the toolbar is hidden.
+        const buttonSize = parseFloat(
+            getComputedStyle(wrapper).getPropertyValue('--toolbox-buttons-size')
+        ) || 26;
+        const buttonsWidth = 2 * buttonSize + 6;
+        // The room on the left of the content, from the edge of the iframe.
+        const contentWidth = parseFloat(getComputedStyle(content).maxWidth) || 650;
+        const roomOnTheLeft = wrapper.getBoundingClientRect().left
+            + Math.max(0, (wrapper.offsetWidth - contentWidth) / 2);
+        wrapper.classList.toggle('codex-editor--narrow', roomOnTheLeft < buttonsWidth);
     }
 
     /**
