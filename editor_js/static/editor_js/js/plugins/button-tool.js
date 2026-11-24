@@ -35,10 +35,10 @@ class ButtonTool {
             alignment: ButtonTool._pick(data.alignment, Object.keys(BUTTON_JUSTIFY), 'left'),
             distribution: ButtonTool._pick(data.distribution, BUTTON_DISTRIBUTIONS, 'grouped'),
             gap: ButtonTool._pick(data.gap, Object.keys(BUTTON_GAPS), 'small'),
-            buttons: buttons.map((button) => ButtonTool._newButton(button))
+            buttons: buttons.map((button) => this._newButton(button))
         };
         if (!this.data.buttons.length) {
-            this.data.buttons.push(ButtonTool._newButton());
+            this.data.buttons.push(this._newButton());
         }
 
         this.wrapper = null;
@@ -52,9 +52,21 @@ class ButtonTool {
         return allowed.includes(value) ? value : fallback;
     }
 
-    static _newButton(button = {}) {
+    // A text of the tool in the language of the editor (editor_js/i18n.py).
+    _t(text) {
+        return this.api.i18n.t(text);
+    }
+
+    // The same, ready for innerHTML.
+    _html(text) {
+        const element = document.createElement('span');
+        element.textContent = this._t(text);
+        return element.innerHTML;
+    }
+
+    _newButton(button = {}) {
         return {
-            text: button.text || 'Click me',
+            text: button.text || this._t('Click me'),
             url: button.url || '',
             btnColor: button.btnColor || 'btn-primary'
         };
@@ -74,7 +86,7 @@ class ButtonTool {
 
         this.missingUrlHint = document.createElement('div');
         this.missingUrlHint.className = 'button-missing-url-hint';
-        this.missingUrlHint.innerText = 'Add a URL to every button in the block settings: a button without one will not be saved.';
+        this.missingUrlHint.innerText = this._t('Add a URL to every button in the block settings: a button without one will not be saved.');
 
         this.wrapper.appendChild(this.row);
         this.wrapper.appendChild(this.missingUrlHint);
@@ -123,13 +135,13 @@ class ButtonTool {
             if (several) {
                 const title = document.createElement('div');
                 title.className = 'button-settings-item-title';
-                title.innerText = `Button ${index + 1}`;
+                title.innerText = this._t('Button %(number)s').replace('%(number)s', index + 1);
                 item.appendChild(title);
             }
 
             item.appendChild(this._createSettingInput({
                 icon: iconText,
-                placeholder: 'Click me',
+                placeholder: this._t('Click me'),
                 value: button.text,
                 onInput: (value) => {
                     button.text = value;
@@ -157,7 +169,7 @@ class ButtonTool {
             ];
             const colorButtons = [];
             colors.forEach((color) => {
-                const colorButton = this._createStyleButton(color.name, () => {
+                const colorButton = this._createStyleButton(this._html(color.name), () => {
                     button.btnColor = color.value;
                     this._updatePreview();
                     this._setActive(colorButtons, colorButton);
@@ -168,7 +180,7 @@ class ButtonTool {
             });
 
             if (several) {
-                actions.appendChild(this._createStyleButton('Remove', () => {
+                actions.appendChild(this._createStyleButton(this._html('Remove'), () => {
                     this.data.buttons.splice(this.data.buttons.indexOf(button), 1);
                     this._buttonsChanged();
                 }, 'button-settings-remove'));
@@ -178,8 +190,8 @@ class ButtonTool {
             container.appendChild(item);
         });
 
-        const addButton = this._createStyleButton('+ Add button', () => {
-            this.data.buttons.push(ButtonTool._newButton());
+        const addButton = this._createStyleButton(this._html('+ Add button'), () => {
+            this.data.buttons.push(this._newButton());
             this._buttonsChanged();
         }, 'button-settings-add');
         container.appendChild(addButton);
@@ -240,7 +252,7 @@ class ButtonTool {
     _createSettingsTitle(text) {
         const title = document.createElement('div');
         title.className = 'button-settings-item-title button-settings-row-title';
-        title.innerText = text;
+        title.innerText = this._t(text);
         return title;
     }
 
@@ -250,7 +262,7 @@ class ButtonTool {
         wrapper.className = 'button-settings-actions';
         const buttons = [];
         choices.forEach((choice) => {
-            const button = this._createStyleButton(choice.label, () => {
+            const button = this._createStyleButton(this._html(choice.label), () => {
                 onChoose(choice.value);
                 this._updatePreview();
                 this._setActive(buttons, button);

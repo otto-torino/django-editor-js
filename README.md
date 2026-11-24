@@ -18,6 +18,7 @@ This library provides a custom `EditorJSField` for your models and a sandboxed i
 -   **Built-in Template Filter**: Render your content with a simple `{% load ... %}` and filter call, no need to write your own rendering logic.
 -   **Sensible Defaults**: Works out-of-the-box with a rich set of common Editor.js tools.
 -   **Admin-Friendly UI**: Features include automatic iframe resizing, a fullscreen editing mode and a live word and character count under each editor for a better user experience.
+-   **Translated UI**: The editor speaks the language of the admin page around it: its menus, its tools and the texts of the library come in English and Italian. The translations live in the library's gettext catalog (each text with the `editor_js` context), so a project can add a language as for any Django app.
 -   **Baton AI ready**: Zero-config integration with [django-baton](https://github.com/otto-torino/django-baton)'s AI features — translation, summarization and correction work on Editor.js fields (see [Baton AI Integration](#baton-ai-integration)).
 
 ---

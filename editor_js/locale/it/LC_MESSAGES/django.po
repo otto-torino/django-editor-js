@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the PACKAGE package.
 # Otto <opensource@otto.srl>, 2025.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION 0.1.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-06 14:44+0200\n"
+"POT-Creation-Date: 2026-11-24 07:53-0600\n"
 "PO-Revision-Date: 2025-08-06 14:44+0200\n"
 "Last-Translator: Otto <opensource@otto.srl>\n"
 "Language-Team: LANGUAGE <opensource@otto.srl>\n"
@@ -17,26 +16,510 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-#: templates/editor_js/editor_js_iframe.html:19
-msgid "Write something..."
-msgstr "Scrivi qualcosa..."
 
-#: templates/editor_js/admin/widgets/editor_js_widget.html:31
+#: i18n.py:23
+msgctxt "editor_js"
+msgid "Click to tune"
+msgstr "Clicca per le impostazioni"
+
+#: i18n.py:24
+msgctxt "editor_js"
+msgid "or drag to move"
+msgstr "o trascina per spostare"
+
+#: i18n.py:27 i18n.py:32
+msgctxt "editor_js"
+msgid "Convert to"
+msgstr "Converti in"
+
+#: i18n.py:28
+msgctxt "editor_js"
+msgid "Add"
+msgstr "Aggiungi"
+
+#: i18n.py:30
+msgctxt "editor_js"
+msgid "Filter"
+msgstr "Filtra"
+
+#: i18n.py:31
+msgctxt "editor_js"
+msgid "Nothing found"
+msgstr "Nessun risultato"
+
+#: i18n.py:38
+msgctxt "editor_js"
+msgid "Text"
+msgstr "Testo"
+
+#: i18n.py:39
+msgctxt "editor_js block"
+msgid "Heading"
+msgstr "Titolo"
+
+#: i18n.py:40
+msgctxt "editor_js"
+msgid "Unordered List"
+msgstr "Elenco puntato"
+
+#: i18n.py:41
+msgctxt "editor_js"
+msgid "Ordered List"
+msgstr "Elenco numerato"
+
+#: i18n.py:42 i18n.py:83
+msgctxt "editor_js"
+msgid "Checklist"
+msgstr "Lista di controllo"
+
+#: i18n.py:43
+msgctxt "editor_js"
+msgid "Quote"
+msgstr "Citazione"
+
+#: i18n.py:44
+msgctxt "editor_js"
+msgid "Table"
+msgstr "Tabella"
+
+#: i18n.py:45
+msgctxt "editor_js"
+msgid "Raw HTML"
+msgstr "HTML"
+
+#: i18n.py:46
+msgctxt "editor_js"
+msgid "Image"
+msgstr "Immagine"
+
+#: i18n.py:47
+msgctxt "editor_js"
+msgid "Button"
+msgstr "Bottone"
+
+#: i18n.py:48
+msgctxt "editor_js"
+msgid "Divider"
+msgstr "Separatore"
+
+#: i18n.py:49
+msgctxt "editor_js"
+msgid "Spacer"
+msgstr "Spazio"
+
+#: i18n.py:50
+msgctxt "editor_js"
+msgid "Link"
+msgstr "Link"
+
+#: i18n.py:51
+msgctxt "editor_js"
+msgid "Bold"
+msgstr "Grassetto"
+
+#: i18n.py:52
+msgctxt "editor_js"
+msgid "Italic"
+msgstr "Corsivo"
+
+#: i18n.py:53
+msgctxt "editor_js"
+msgid "Highlight"
+msgstr "Evidenzia"
+
+#: i18n.py:54
+msgctxt "editor_js"
+msgid "Font size"
+msgstr "Dimensione del testo"
+
+#: i18n.py:58
+msgctxt "editor_js"
+msgid "Error"
+msgstr "Errore"
+
+#: i18n.py:60
+msgctxt "editor_js"
+msgid "The block can not be displayed correctly."
+msgstr "Il blocco non può essere mostrato correttamente."
+
+#: i18n.py:65
+msgctxt "editor_js"
+msgid "Delete"
+msgstr "Elimina"
+
+#: i18n.py:65
+msgctxt "editor_js"
+msgid "Click to delete"
+msgstr "Clicca per eliminare"
+
+#: i18n.py:66
+msgctxt "editor_js"
+msgid "Move up"
+msgstr "Sposta su"
+
+#: i18n.py:67
+msgctxt "editor_js"
+msgid "Move down"
+msgstr "Sposta giù"
+
+#: i18n.py:74
+#, python-format
+msgctxt "editor_js"
+msgid "Heading %(level)s"
+msgstr "Titolo %(level)s"
+
+#: i18n.py:81
+msgctxt "editor_js"
+msgid "Unordered"
+msgstr "Puntato"
+
+#: i18n.py:82
+msgctxt "editor_js"
+msgid "Ordered"
+msgstr "Numerato"
+
+#: i18n.py:84
+msgctxt "editor_js"
+msgid "Counter type"
+msgstr "Tipo di numerazione"
+
+#: i18n.py:85
+msgctxt "editor_js"
+msgid "Start with"
+msgstr "Inizia da"
+
+#: i18n.py:86
+msgctxt "editor_js"
+msgid "Numeric"
+msgstr "Numeri"
+
+#: i18n.py:87
+msgctxt "editor_js"
+msgid "Lower Roman"
+msgstr "Numeri romani minuscoli"
+
+#: i18n.py:88
+msgctxt "editor_js"
+msgid "Upper Roman"
+msgstr "Numeri romani maiuscoli"
+
+#: i18n.py:89
+msgctxt "editor_js"
+msgid "Lower Alpha"
+msgstr "Lettere minuscole"
+
+#: i18n.py:90
+msgctxt "editor_js"
+msgid "Upper Alpha"
+msgstr "Lettere maiuscole"
+
+#: i18n.py:96
+msgctxt "editor_js"
+msgid "Enter a quote"
+msgstr "Scrivi una citazione"
+
+#: i18n.py:97 i18n.py:124
+msgctxt "editor_js"
+msgid "Enter a caption"
+msgstr "Scrivi una didascalia"
+
+#: i18n.py:98
+msgctxt "editor_js"
+msgid "Align Left"
+msgstr "Allinea a sinistra"
+
+#: i18n.py:99
+msgctxt "editor_js"
+msgid "Align Center"
+msgstr "Allinea al centro"
+
+#: i18n.py:105
+msgctxt "editor_js"
+msgid "Add column to left"
+msgstr "Aggiungi colonna a sinistra"
+
+#: i18n.py:106
+msgctxt "editor_js"
+msgid "Add column to right"
+msgstr "Aggiungi colonna a destra"
+
+#: i18n.py:107
+msgctxt "editor_js"
+msgid "Add row above"
+msgstr "Aggiungi riga sopra"
+
+#: i18n.py:108
+msgctxt "editor_js"
+msgid "Add row below"
+msgstr "Aggiungi riga sotto"
+
+#: i18n.py:109
+msgctxt "editor_js"
+msgid "Delete column"
+msgstr "Elimina colonna"
+
+#: i18n.py:110
+msgctxt "editor_js"
+msgid "Delete row"
+msgstr "Elimina riga"
+
+#: i18n.py:111
+msgctxt "editor_js table row"
+msgid "Heading"
+msgstr "Intestazione"
+
+#: i18n.py:112
+msgctxt "editor_js"
+msgid "With headings"
+msgstr "Con intestazione"
+
+#: i18n.py:113
+msgctxt "editor_js"
+msgid "Without headings"
+msgstr "Senza intestazione"
+
+#: i18n.py:114
+msgctxt "editor_js"
+msgid "Stretch"
+msgstr "Allarga"
+
+#: i18n.py:115
+msgctxt "editor_js"
+msgid "Collapse"
+msgstr "Restringi"
+
+#: i18n.py:120
+msgctxt "editor_js"
+msgid "Enter HTML code"
+msgstr "Scrivi il codice HTML"
+
+#: i18n.py:129
+msgctxt "editor_js"
+msgid "Caption"
+msgstr "Didascalia"
+
+#: i18n.py:130
+msgctxt "editor_js"
+msgid "Select an Image"
+msgstr "Seleziona un'immagine"
+
+#: i18n.py:132
+msgctxt "editor_js"
+msgid "Couldn’t upload image. Please try another."
+msgstr "Impossibile caricare l'immagine. Prova con un'altra."
+
+#: i18n.py:134
+msgctxt "editor_js"
+msgid "With border"
+msgstr "Con bordo"
+
+#: i18n.py:135
+msgctxt "editor_js"
+msgid "Stretch image"
+msgstr "Allarga l'immagine"
+
+#: i18n.py:136
+msgctxt "editor_js"
+msgid "With background"
+msgstr "Con sfondo"
+
+#: i18n.py:137
+msgctxt "editor_js"
+msgid "With caption"
+msgstr "Con didascalia"
+
+#: i18n.py:143
+msgctxt "editor_js"
+msgid "Click me"
+msgstr "Clicca qui"
+
+#: i18n.py:144
+#, python-format
+msgctxt "editor_js"
+msgid "Button %(number)s"
+msgstr "Bottone %(number)s"
+
+#: i18n.py:147
+msgctxt "editor_js"
+msgid ""
+"Add a URL to every button in the block settings: a button without one will "
+"not be saved."
+msgstr "Aggiungi un URL a ogni bottone nelle impostazioni del blocco: un bottone senza URL non verrà salvato."
+
+#: i18n.py:149
+msgctxt "editor_js"
+msgid "Primary"
+msgstr "Primario"
+
+#: i18n.py:150
+msgctxt "editor_js"
+msgid "Secondary"
+msgstr "Secondario"
+
+#: i18n.py:151
+msgctxt "editor_js"
+msgid "Remove"
+msgstr "Rimuovi"
+
+#: i18n.py:152
+msgctxt "editor_js"
+msgid "+ Add button"
+msgstr "+ Aggiungi bottone"
+
+#: i18n.py:153
+msgctxt "editor_js"
+msgid "Layout"
+msgstr "Disposizione"
+
+#: i18n.py:154
+msgctxt "editor_js"
+msgid "Grouped"
+msgstr "Raggruppati"
+
+#: i18n.py:155
+msgctxt "editor_js"
+msgid "Spread"
+msgstr "Distribuiti"
+
+#: i18n.py:156
+msgctxt "editor_js"
+msgid "Fill"
+msgstr "Riempi"
+
+#: i18n.py:157
+msgctxt "editor_js"
+msgid "Spacing"
+msgstr "Spaziatura"
+
+#: i18n.py:158
+msgctxt "editor_js button spacing"
+msgid "Small"
+msgstr "Piccola"
+
+#: i18n.py:159
+msgctxt "editor_js button spacing"
+msgid "Medium"
+msgstr "Media"
+
+#: i18n.py:160
+msgctxt "editor_js button spacing"
+msgid "Large"
+msgstr "Grande"
+
+#: i18n.py:166
+msgctxt "editor_js spacer size"
+msgid "Small"
+msgstr "Piccolo"
+
+#: i18n.py:167
+msgctxt "editor_js spacer size"
+msgid "Medium"
+msgstr "Medio"
+
+#: i18n.py:168
+msgctxt "editor_js spacer size"
+msgid "Large"
+msgstr "Grande"
+
+#: i18n.py:174
+msgctxt "editor_js"
+msgid "Add a link"
+msgstr "Aggiungi un link"
+
+#: i18n.py:175
+msgctxt "editor_js"
+msgid "Open in new tab"
+msgstr "Apri in una nuova scheda"
+
+#: i18n.py:176
+msgctxt "editor_js"
+msgid "Save link (Enter)"
+msgstr "Salva il link (Invio)"
+
+#: i18n.py:177
+msgctxt "editor_js"
+msgid "Pasted link is not valid."
+msgstr "Il link incollato non è valido."
+
+#: i18n.py:183
+msgctxt "editor_js font size"
+msgid "Small"
+msgstr "Piccolo"
+
+#: i18n.py:184
+msgctxt "editor_js font size"
+msgid "Normal"
+msgstr "Normale"
+
+#: i18n.py:185
+msgctxt "editor_js font size"
+msgid "Large"
+msgstr "Grande"
+
+#: i18n.py:186
+msgctxt "editor_js font size"
+msgid "Huge"
+msgstr "Enorme"
+
+#: i18n.py:224
+msgctxt "editor_js"
+msgid "Convert selected blocks"
+msgstr "Converti i blocchi selezionati"
+
+#: i18n.py:225
+msgctxt "editor_js"
+msgid "Convert to bulleted list"
+msgstr "Converti in elenco puntato"
+
+#: i18n.py:226
+msgctxt "editor_js"
+msgid "Bulleted list"
+msgstr "Elenco puntato"
+
+#: i18n.py:227
+msgctxt "editor_js"
+msgid "Convert to numbered list"
+msgstr "Converti in elenco numerato"
+
+#: i18n.py:228
+msgctxt "editor_js"
+msgid "Numbered list"
+msgstr "Elenco numerato"
+
+#: i18n.py:229
+msgctxt "editor_js"
+msgid "Convert list items to paragraphs"
+msgstr "Converti le voci in paragrafi"
+
+#: i18n.py:230
+msgctxt "editor_js"
+msgid "Paragraphs"
+msgstr "Paragrafi"
+
+#: templates/editor_js/admin/widgets/editor_js_widget.html:17
+msgid "Toggle Fullscreen"
+msgstr "Schermo intero"
+
+#: templates/editor_js/admin/widgets/editor_js_widget.html:25
+msgid "Editor"
+msgstr "Editor"
+
+#: templates/editor_js/admin/widgets/editor_js_widget.html:35
 msgid "word"
 msgstr "parola"
 
-#: templates/editor_js/admin/widgets/editor_js_widget.html:32
+#: templates/editor_js/admin/widgets/editor_js_widget.html:36
 msgid "words"
 msgstr "parole"
 
-#: templates/editor_js/admin/widgets/editor_js_widget.html:33
+#: templates/editor_js/admin/widgets/editor_js_widget.html:37
 msgid "character"
 msgstr "carattere"
 
-#: templates/editor_js/admin/widgets/editor_js_widget.html:34
+#: templates/editor_js/admin/widgets/editor_js_widget.html:38
 msgid "characters"
 msgstr "caratteri"
 
-#: editor_js/templates/editor_js/admin/widgets/editor_js_widget.html
-msgid "Editor"
-msgstr "Editor"
+#: templates/editor_js/editor_js_iframe.html:28
+msgid "Write something..."
+msgstr "Scrivi qualcosa..."

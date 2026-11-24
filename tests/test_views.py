@@ -1,8 +1,10 @@
 import base64
 import importlib.util
+import json
 import os
 import re
 import shutil
+from html import unescape
 from unittest import skipUnless
 
 import django
@@ -10,6 +12,8 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
+
+from editor_js.config import get_editor_js_config
 
 TEST_MEDIA_ROOT = os.path.join(os.path.dirname(__file__), 'test_media')
 
@@ -30,6 +34,61 @@ class ViewsTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'editor_js/editor_js_iframe.html')
+
+    def _iframe_i18n(self, query=''):
+        html = self.client.get(reverse('editor_js_iframe') + query).content.decode()
+        raw = re.search(r"data-i18n-json='([^']*)'", html).group(1)
+        return html, json.loads(unescape(raw))
+
+    def test_iframe_is_translated_in_the_language_asked_by_the_widget(self):
+        html, i18n = self._iframe_i18n('?lang=it')
+
+        self.assertIn('<html lang="it">', html)
+        self.assertIn('data-placeholder="Scrivi qualcosa..."', html)
+        messages = i18n['messages']
+        self.assertEqual(messages['ui']['popover']['Filter'], 'Filtra')
+        self.assertEqual(messages['blockTunes']['moveUp']['Move up'], 'Sposta su')
+        self.assertEqual(messages['toolNames']['Button'], 'Bottone')
+        tools = i18n['toolMessages']
+        self.assertEqual(tools['ButtonTool']['+ Add button'], '+ Aggiungi bottone')
+        self.assertEqual(tools['Header']['Heading 2'], 'Titolo 2')
+        self.assertEqual(i18n['iframe']['Paragraphs'], 'Paragrafi')
+
+    def test_iframe_translates_the_same_english_text_by_its_context(self):
+        _, i18n = self._iframe_i18n('?lang=it')
+        tools = i18n['toolMessages']
+
+        self.assertEqual(i18n['messages']['toolNames']['Heading'], 'Titolo')
+        self.assertEqual(tools['Table']['Heading'], 'Intestazione')
+        self.assertEqual(tools['ButtonTool']['Small'], 'Piccola')
+        self.assertEqual(tools['SpacerTool']['Small'], 'Piccolo')
+
+    def test_iframe_texts_are_not_taken_from_other_apps(self):
+        """
+        Django uses the translation of the first installed app that has a
+        text: the admin, before the editor, translates "Delete" as "Cancella".
+        """
+        with self.modify_settings(INSTALLED_APPS={'prepend': 'django.contrib.admin'}):
+            _, i18n = self._iframe_i18n('?lang=it')
+
+        self.assertEqual(i18n['messages']['blockTunes']['delete']['Delete'], 'Elimina')
+        self.assertEqual(i18n['messages']['ui']['toolbar']['toolbox']['Add'], 'Aggiungi')
+
+    def test_iframe_has_a_text_for_every_tool_of_the_default_config(self):
+        """Every default tool with texts of its own has their translations."""
+        _, i18n = self._iframe_i18n('?lang=it')
+        for name, info in get_editor_js_config()['TOOLS'].items():
+            if info['class'] in ('DividerTool', 'MarkerTool'):
+                continue  # no texts but their title, in toolNames
+            with self.subTest(tool=name):
+                self.assertIn(info['class'], i18n['toolMessages'])
+
+    def test_iframe_falls_back_to_the_language_of_the_request(self):
+        """A language the project does not have is not used."""
+        html, i18n = self._iframe_i18n('?lang=xx')
+
+        self.assertIn('<html lang="en-us">', html)
+        self.assertEqual(i18n['messages']['ui']['popover']['Filter'], 'Filter')
 
     def test_iframe_has_no_inline_script(self):
         """

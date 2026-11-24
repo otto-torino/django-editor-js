@@ -5,7 +5,8 @@
     editor and its tools inject.
 {% endcomment %}
 <!DOCTYPE html>
-<html lang="en">
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <title>EditorJS</title>
@@ -23,6 +24,7 @@
     data-upload-image-url="{{ upload_image_url }}"
     data-csrf-token="{{ csrf_token|escapejs }}"
     data-tools-json='{{ tools_json }}'
+    data-i18n-json='{{ i18n_json }}'
     data-placeholder="{% trans 'Write something...' %}"
 >
     <div id="editor-js-holder"></div>

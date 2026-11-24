@@ -41,7 +41,8 @@ class SpacerTool {
 
     _sizeSetting(size, label) {
         return {
-            label: label,
+            // in the language of the editor (editor_js/i18n.py)
+            label: this.api.i18n.t(label),
             icon: '<svg width="20" height="20" viewBox="0 0 20 20"><path d="M4 5h12M4 15h12M10 7v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
             isActive: this.data.size === size,
             closeOnActivate: true,

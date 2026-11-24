@@ -19,11 +19,14 @@
     let _pendingBlockIndexes = [];
     let _selectionObserver = null;
     let _selectionUpdateFrame = null;
+    let _toolClassNames = {};
     let _config = {
         trustedOrigin: '',
         uploadImageUrl: '',
         csrfToken: '',
-        toolsConfig: {}
+        toolsConfig: {},
+        // the translations of editor_js/i18n.py
+        i18n: { messages: {}, toolMessages: {}, iframe: {} }
     };
 
     // --- Private Methods ---
@@ -37,6 +40,9 @@
         _config.uploadImageUrl = body.dataset.uploadImageUrl || '';
         _config.csrfToken = body.dataset.csrfToken || '';
         _config.toolsConfig = body.dataset.toolsJson ? JSON.parse(body.dataset.toolsJson) : {};
+        if (body.dataset.i18nJson) {
+            _config.i18n = JSON.parse(body.dataset.i18nJson);
+        }
 
         console.log('[DEBUG] 1. Default config loaded from <body>:', _config.toolsConfig);
 
@@ -107,6 +113,8 @@
                     toolSettings.config = finalConfig;
                 }
                 tools[name] = toolSettings;
+                // a minified class has lost its name: keep the configured one
+                _toolClassNames[name] = toolInfo.class;
             } else {
                 console.warn(`[DjangoEditorJSIframe] Tool class '${toolInfo.class}' was not found.`);
             }
@@ -114,6 +122,37 @@
         
         console.log('[DEBUG] 6. Final tools object for EditorJS:', tools);
         return tools;
+    }
+
+    /**
+     * The i18n messages of Editor.js: Editor.js looks up the texts of a tool
+     * under the name it is registered with, so the texts of each tool, kept
+     * by its class, are filed under its name.
+     * @param {object} tools - The 'tools' object for EditorJS.
+     * @returns {object} The `i18n.messages` of Editor.js.
+     */
+    function _buildMessages(tools) {
+        const messages = JSON.parse(JSON.stringify(_config.i18n.messages || {}));
+        messages.tools = messages.tools || {};
+        const toolMessages = _config.i18n.toolMessages || {};
+        for (const name in tools) {
+            const texts = toolMessages[_toolClassNames[name]];
+            if (texts) messages.tools[name] = texts;
+        }
+        return messages;
+    }
+
+    /**
+     * A text of the iframe around the editor, in the language of the page.
+     */
+    function _t(text) {
+        return (_config.i18n.iframe || {})[text] || text;
+    }
+
+    function _escapeHtml(text) {
+        const element = document.createElement('span');
+        element.textContent = text;
+        return element.innerHTML.replace(/"/g, '&quot;');
     }
 
     /**
@@ -310,20 +349,20 @@
         _bulkListControl = document.createElement('div');
         _bulkListControl.className = 'editor-js-bulk-list-control';
         _bulkListControl.setAttribute('role', 'toolbar');
-        _bulkListControl.setAttribute('aria-label', 'Convert selected blocks');
+        _bulkListControl.setAttribute('aria-label', _t('Convert selected blocks'));
+        const action = (name, hint, label, icon) => {
+            const title = _escapeHtml(_t(hint));
+            return '<button type="button" class="editor-js-bulk-list-action" data-action="' + name +
+                '" title="' + title + '" aria-label="' + title + '">' + icon +
+                '<span>' + _escapeHtml(_t(label)) + '</span></button>';
+        };
         _bulkListControl.innerHTML =
-            '<button type="button" class="editor-js-bulk-list-action" data-action="unordered" title="Convert to bulleted list" aria-label="Convert to bulleted list">' +
-                '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7 5h10M7 10h10M7 15h10M3 5h.01M3 10h.01M3 15h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>' +
-                '<span>Bulleted list</span>' +
-            '</button>' +
-            '<button type="button" class="editor-js-bulk-list-action" data-action="ordered" title="Convert to numbered list" aria-label="Convert to numbered list">' +
-                '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7 5h10M7 10h10M7 15h10M3 4v2M2.5 10h1L2.5 11.5h1M2.5 14.5h1v1h-1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
-                '<span>Numbered list</span>' +
-            '</button>' +
-            '<button type="button" class="editor-js-bulk-list-action" data-action="paragraph" title="Convert list items to paragraphs" aria-label="Convert list items to paragraphs">' +
-                '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 4h10M5 8h10M5 12h10M5 16h7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>' +
-                '<span>Paragraphs</span>' +
-            '</button>';
+            action('unordered', 'Convert to bulleted list', 'Bulleted list',
+                '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7 5h10M7 10h10M7 15h10M3 5h.01M3 10h.01M3 15h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>') +
+            action('ordered', 'Convert to numbered list', 'Numbered list',
+                '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7 5h10M7 10h10M7 15h10M3 4v2M2.5 10h1L2.5 11.5h1M2.5 14.5h1v1h-1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>') +
+            action('paragraph', 'Convert list items to paragraphs', 'Paragraphs',
+                '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 4h10M5 8h10M5 12h10M5 16h7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>');
 
         _bulkListControl.addEventListener('pointerdown', (event) => {
             const action = event.target.closest('.editor-js-bulk-list-action');
@@ -374,6 +413,7 @@
             tools: tools,
             data: initialData,
             placeholder: document.body.dataset.placeholder || 'Write something...',
+            i18n: { messages: _buildMessages(tools) },
 
             onReady: () => {
                 console.log('[DEBUG] 7. Editor.js is ready.');

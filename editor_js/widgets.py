@@ -1,6 +1,9 @@
 import json
+from urllib.parse import urlencode
+
 from django import forms
 from django.urls import reverse
+from django.utils.translation import get_language
 
 class EditorJsIframeWidget(forms.Widget):
     template_name = 'editor_js/admin/widgets/editor_js_widget.html'
@@ -18,7 +21,10 @@ class EditorJsIframeWidget(forms.Widget):
         config = context['widget']['attrs'].pop('config', {})
 
         context['widget']['config_json'] = json.dumps(config)
-        context['widget']['iframe_src'] = reverse('editor_js_iframe')
+        # the iframe is another request: tell it the language of this page
+        context['widget']['iframe_src'] = (
+            f"{reverse('editor_js_iframe')}?{urlencode({'lang': get_language() or ''})}"
+        )
         return context
 
     class Media:

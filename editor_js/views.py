@@ -5,11 +5,27 @@ from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils import translation
 from django.utils.module_loading import import_string
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_POST
 
 from .config import get_editor_js_config, get_editor_js_storage
+from .i18n import get_editor_js_i18n
+
+
+def _requested_language(request):
+    """
+    The language the widget asks for, the one of the page around the iframe,
+    when the project has it; otherwise None, and the language of the request.
+    """
+    language = request.GET.get('lang')
+    if not language:
+        return None
+    try:
+        return translation.get_supported_language_variant(language)
+    except LookupError:
+        return None
 
 
 @xframe_options_sameorigin
@@ -21,14 +37,17 @@ def editor_js_iframe_view(request):
     tools_config = config.get('TOOLS', {})
     css_files = config.get('CSS_FILES', [])
 
-    return render(request, 'editor_js/editor_js_iframe.html', {
-        "trusted_origin": origin,
-        "upload_image_url": reverse('editor_js_image_upload'),
-        "csrf_token": csrf_token,
-        "css_files": css_files,
-        "tools_config": tools_config,
-        "tools_json": json.dumps(tools_config)
-    })
+    language = _requested_language(request) or translation.get_language()
+    with translation.override(language):
+        return render(request, 'editor_js/editor_js_iframe.html', {
+            "trusted_origin": origin,
+            "upload_image_url": reverse('editor_js_image_upload'),
+            "csrf_token": csrf_token,
+            "css_files": css_files,
+            "tools_config": tools_config,
+            "tools_json": json.dumps(tools_config),
+            "i18n_json": json.dumps(get_editor_js_i18n()),
+        })
 
 
 def can_upload_images(request):

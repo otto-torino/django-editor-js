@@ -22,7 +22,10 @@ class WidgetTest(TestCase):
         self.assertEqual(context['widget']['config_json'], '{}')
 
         self.assertIn('iframe_src', context['widget'])
-        self.assertEqual(context['widget']['iframe_src'], reverse('editor_js_iframe'))
+        self.assertEqual(
+            context['widget']['iframe_src'],
+            f"{reverse('editor_js_iframe')}?lang={translation.get_language()}",
+        )
 
     def test_get_context_with_custom_config(self):
         """
@@ -45,7 +48,17 @@ class WidgetTest(TestCase):
 
         self.assertNotIn('config', context['widget']['attrs'])
 
-        self.assertEqual(context['widget']['iframe_src'], reverse('editor_js_iframe'))
+        self.assertEqual(
+            context['widget']['iframe_src'],
+            f"{reverse('editor_js_iframe')}?lang={translation.get_language()}",
+        )
+
+    def test_the_iframe_gets_the_language_of_the_page(self):
+        """The iframe is another request: the widget tells it the language."""
+        widget = EditorJsIframeWidget()
+        with translation.override('it'):
+            context = widget.get_context(name='content', value='', attrs=None)
+        self.assertEqual(context['widget']['iframe_src'], f"{reverse('editor_js_iframe')}?lang=it")
 
     def test_get_context_normalizes_empty_values(self):
         """
@@ -165,7 +178,7 @@ class VendorScriptsTest(TestCase):
         with translation.override('it'):
             html = widget.render(name='content', value='', attrs={})
 
-        self.assertIn(f'data-src="{reverse("editor_js_iframe")}"', html)
+        self.assertIn(f'data-src="{reverse("editor_js_iframe")}?lang=it"', html)
         self.assertNotIn(' src="', html)
         self.assertIn('title="Editor"', html)
         script = (Path(editor_js.__file__).parent / 'static/editor_js/js/editor_js_widget.js').read_text()
