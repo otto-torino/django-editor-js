@@ -357,6 +357,15 @@ tr:nth-child(even) {
     --max-height: 600px;
 }
 
+/* "Filter" searches the items of a menu by name. The menu of a block has a
+   few, all in sight, and its search ignores the forms of the tools: typing in
+   it hides the whole form of the buttons. It stays where it helps, among the
+   many kinds of block: the toolbox of the +, and "Convert to", a menu nested
+   in the one of the block (hence the children only). */
+.ce-settings > .ce-popover > .ce-popover__container > .cdx-search-field {
+    display: none;
+}
+
 .button-settings-item {
     padding-bottom: 10px;
     margin-bottom: 10px;
