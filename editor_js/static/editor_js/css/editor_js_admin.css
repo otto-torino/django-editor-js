@@ -386,13 +386,54 @@ tr:nth-child(even) {
     margin-top: 8px;
 }
 
-.button-settings-remove {
+.cdx-settings-button.button-settings-remove {
     margin-left: auto;
+    padding: 6px;
+    border-radius: 6px;
     color: #dc3545;
 }
 
-.button-settings-add {
+.cdx-settings-button.button-settings-remove:hover,
+.cdx-settings-button.button-settings-remove:focus-visible {
+    background: rgba(220, 53, 69, 0.1);
+}
+
+/* Adding a button is the main action of the settings: a button of its own,
+   in the color of the active items of Editor.js, not a plain item. */
+.cdx-settings-button.button-settings-add {
     width: 100%;
+    margin: 4px 0 2px;
+    padding: 9px 12px;
+    border: 1px dashed #388ae5;
+    border-radius: 6px;
+    background: rgba(56, 138, 229, 0.06);
+    color: #388ae5;
+    font-family: sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.cdx-settings-button.button-settings-add:hover,
+.cdx-settings-button.button-settings-add:focus-visible {
+    border-style: solid;
+    background: rgba(56, 138, 229, 0.14);
+}
+
+/* The layouts of the row, drawn: room to point at them, and the chosen one
+   on a background. */
+.cdx-settings-button.button-settings-icon-choice {
+    padding: 4px 6px;
+    border-radius: 6px;
+    color: #707684;
+}
+
+.cdx-settings-button.button-settings-icon-choice:hover {
+    background: #f2f3f5;
+}
+
+.cdx-settings-button.button-settings-icon-choice.cdx-settings-button--active {
+    color: #388ae5;
+    background: rgba(56, 138, 229, 0.1);
 }
 
 .button-settings-colors {

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION 0.1.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-24 07:53-0600\n"
+"POT-Creation-Date: 2026-11-24 08:42-0600\n"
 "PO-Revision-Date: 2025-08-06 14:44+0200\n"
 "Last-Translator: Otto <opensource@otto.srl>\n"
 "Language-Team: LANGUAGE <opensource@otto.srl>\n"
@@ -373,125 +373,135 @@ msgstr ""
 
 #: i18n.py:154
 msgctxt "editor_js"
-msgid "Grouped"
+msgid "Grouped on the left"
 msgstr ""
 
 #: i18n.py:155
 msgctxt "editor_js"
-msgid "Spread"
+msgid "Grouped in the center"
 msgstr ""
 
 #: i18n.py:156
 msgctxt "editor_js"
-msgid "Fill"
+msgid "Grouped on the right"
 msgstr ""
 
 #: i18n.py:157
 msgctxt "editor_js"
-msgid "Spacing"
+msgid "Spread"
 msgstr ""
 
 #: i18n.py:158
-msgctxt "editor_js button spacing"
-msgid "Small"
+msgctxt "editor_js"
+msgid "Fill"
 msgstr ""
 
 #: i18n.py:159
-msgctxt "editor_js button spacing"
-msgid "Medium"
+msgctxt "editor_js"
+msgid "Spacing"
 msgstr ""
 
 #: i18n.py:160
 msgctxt "editor_js button spacing"
-msgid "Large"
-msgstr ""
-
-#: i18n.py:166
-msgctxt "editor_js spacer size"
 msgid "Small"
 msgstr ""
 
-#: i18n.py:167
-msgctxt "editor_js spacer size"
+#: i18n.py:161
+msgctxt "editor_js button spacing"
 msgid "Medium"
+msgstr ""
+
+#: i18n.py:162
+msgctxt "editor_js button spacing"
+msgid "Large"
 msgstr ""
 
 #: i18n.py:168
 msgctxt "editor_js spacer size"
+msgid "Small"
+msgstr ""
+
+#: i18n.py:169
+msgctxt "editor_js spacer size"
+msgid "Medium"
+msgstr ""
+
+#: i18n.py:170
+msgctxt "editor_js spacer size"
 msgid "Large"
-msgstr ""
-
-#: i18n.py:174
-msgctxt "editor_js"
-msgid "Add a link"
-msgstr ""
-
-#: i18n.py:175
-msgctxt "editor_js"
-msgid "Open in new tab"
 msgstr ""
 
 #: i18n.py:176
 msgctxt "editor_js"
-msgid "Save link (Enter)"
+msgid "Add a link"
 msgstr ""
 
 #: i18n.py:177
 msgctxt "editor_js"
+msgid "Open in new tab"
+msgstr ""
+
+#: i18n.py:178
+msgctxt "editor_js"
+msgid "Save link (Enter)"
+msgstr ""
+
+#: i18n.py:179
+msgctxt "editor_js"
 msgid "Pasted link is not valid."
-msgstr ""
-
-#: i18n.py:183
-msgctxt "editor_js font size"
-msgid "Small"
-msgstr ""
-
-#: i18n.py:184
-msgctxt "editor_js font size"
-msgid "Normal"
 msgstr ""
 
 #: i18n.py:185
 msgctxt "editor_js font size"
-msgid "Large"
+msgid "Small"
 msgstr ""
 
 #: i18n.py:186
 msgctxt "editor_js font size"
+msgid "Normal"
+msgstr ""
+
+#: i18n.py:187
+msgctxt "editor_js font size"
+msgid "Large"
+msgstr ""
+
+#: i18n.py:188
+msgctxt "editor_js font size"
 msgid "Huge"
-msgstr ""
-
-#: i18n.py:224
-msgctxt "editor_js"
-msgid "Convert selected blocks"
-msgstr ""
-
-#: i18n.py:225
-msgctxt "editor_js"
-msgid "Convert to bulleted list"
 msgstr ""
 
 #: i18n.py:226
 msgctxt "editor_js"
-msgid "Bulleted list"
+msgid "Convert selected blocks"
 msgstr ""
 
 #: i18n.py:227
 msgctxt "editor_js"
-msgid "Convert to numbered list"
+msgid "Convert to bulleted list"
 msgstr ""
 
 #: i18n.py:228
 msgctxt "editor_js"
-msgid "Numbered list"
+msgid "Bulleted list"
 msgstr ""
 
 #: i18n.py:229
 msgctxt "editor_js"
-msgid "Convert list items to paragraphs"
+msgid "Convert to numbered list"
 msgstr ""
 
 #: i18n.py:230
+msgctxt "editor_js"
+msgid "Numbered list"
+msgstr ""
+
+#: i18n.py:231
+msgctxt "editor_js"
+msgid "Convert list items to paragraphs"
+msgstr ""
+
+#: i18n.py:232
 msgctxt "editor_js"
 msgid "Paragraphs"
 msgstr ""

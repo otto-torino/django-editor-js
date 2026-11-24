@@ -11,6 +11,30 @@
 const BUTTON_JUSTIFY = { left: 'flex-start', center: 'center', right: 'flex-end' };
 const BUTTON_GAPS = { small: '0.5rem', medium: '1rem', large: '2rem' };
 const BUTTON_DISTRIBUTIONS = ['grouped', 'spread', 'fill'];
+// Two buttons in a row, between the edges of the row.
+const BUTTON_LAYOUT_ICON = (buttons) => '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="24" viewBox="0 0 36 24" fill="none" aria-hidden="true">' +
+    '<path d="M2 4v16M34 4v16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".45"/>' +
+    buttons.map(([x, width]) => `<rect x="${x}" y="8.5" width="${width}" height="7" rx="2" fill="currentColor"/>`).join('') +
+    '</svg>';
+const BUTTON_LAYOUT_ICONS = {
+    'grouped-left': BUTTON_LAYOUT_ICON([[5, 10], [16.5, 10]]),
+    'grouped-center': BUTTON_LAYOUT_ICON([[7.25, 10], [18.75, 10]]),
+    'grouped-right': BUTTON_LAYOUT_ICON([[9.5, 10], [21, 10]]),
+    spread: BUTTON_LAYOUT_ICON([[5, 10], [21, 10]]),
+    fill: BUTTON_LAYOUT_ICON([[5, 12.5], [18.5, 12.5]])
+};
+// Two buttons and the space between them: no edges, unlike the layouts.
+const BUTTON_GAP_ICON = (buttons) => '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="24" viewBox="0 0 36 24" fill="none" aria-hidden="true">' +
+    buttons.map(([x, width]) => `<rect x="${x}" y="8.5" width="${width}" height="7" rx="2" fill="currentColor"/>`).join('') +
+    '</svg>';
+const BUTTON_GAP_ICONS = {
+    small: BUTTON_GAP_ICON([[9.25, 8], [18.75, 8]]),
+    medium: BUTTON_GAP_ICON([[7, 8], [21, 8]]),
+    large: BUTTON_GAP_ICON([[3, 8], [25, 8]])
+};
+// A bin, to remove a button from the row.
+const BUTTON_REMOVE_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/></svg>';
 // The style of each button of a row, as BUTTON_STYLES in renderers.py.
 const BUTTON_STYLES = {
     grouped: {},
@@ -180,10 +204,14 @@ class ButtonTool {
             });
 
             if (several) {
-                actions.appendChild(this._createStyleButton(this._html('Remove'), () => {
+                const remove = this._createStyleButton(BUTTON_REMOVE_ICON, () => {
                     this.data.buttons.splice(this.data.buttons.indexOf(button), 1);
                     this._buttonsChanged();
-                }, 'button-settings-remove'));
+                }, 'button-settings-remove');
+                // an icon says its name on hover, and to a screen reader
+                remove.title = this._t('Remove');
+                remove.setAttribute('aria-label', this._t('Remove'));
+                actions.appendChild(remove);
             }
 
             item.appendChild(actions);
@@ -196,51 +224,31 @@ class ButtonTool {
         }, 'button-settings-add');
         container.appendChild(addButton);
 
+        // one choice for where the buttons go: the alignment places only a
+        // grouped row, the other layouts use the whole width
         container.appendChild(this._createSettingsTitle('Layout'));
-
-        // the alignment places a grouped row only: the other layouts use the
-        // whole width
-        const alignButtonsWrapper = document.createElement('div');
-        alignButtonsWrapper.className = 'button-settings-actions';
-        alignButtonsWrapper.hidden = this.data.distribution !== 'grouped';
-
         container.appendChild(this._createChoiceRow(
             [
-                { value: 'grouped', label: 'Grouped' },
-                { value: 'spread', label: 'Spread' },
-                { value: 'fill', label: 'Fill' }
+                { value: 'grouped-left', label: 'Grouped on the left', icon: BUTTON_LAYOUT_ICONS['grouped-left'] },
+                { value: 'grouped-center', label: 'Grouped in the center', icon: BUTTON_LAYOUT_ICONS['grouped-center'] },
+                { value: 'grouped-right', label: 'Grouped on the right', icon: BUTTON_LAYOUT_ICONS['grouped-right'] },
+                { value: 'spread', label: 'Spread', icon: BUTTON_LAYOUT_ICONS.spread },
+                { value: 'fill', label: 'Fill', icon: BUTTON_LAYOUT_ICONS.fill }
             ],
-            this.data.distribution,
+            this.data.distribution === 'grouped' ? `grouped-${this.data.alignment}` : this.data.distribution,
             (value) => {
-                this.data.distribution = value;
-                alignButtonsWrapper.hidden = value !== 'grouped';
+                const [distribution, alignment] = value.split('-');
+                this.data.distribution = distribution;
+                if (alignment) this.data.alignment = alignment;
             }
         ));
-
-        const alignments = [
-            { name: 'left', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="17" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="3" y2="18"/></svg>' },
-            { name: 'center', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="10" x2="6" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="18" y1="18" x2="6" y2="18"/></svg>' },
-            { name: 'right', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="10" x2="7" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="7" y2="14"/><line x1="21" y1="18" x2="3" y2="18"/></svg>' }
-        ];
-        const alignButtons = [];
-        alignments.forEach((align) => {
-            const alignButton = this._createStyleButton(align.icon, () => {
-                this.data.alignment = align.name;
-                this._updatePreview();
-                this._setActive(alignButtons, alignButton);
-            });
-            alignButtons.push(alignButton);
-            if (this.data.alignment === align.name) this._setActive([alignButton], alignButton);
-            alignButtonsWrapper.appendChild(alignButton);
-        });
-        container.appendChild(alignButtonsWrapper);
 
         container.appendChild(this._createSettingsTitle('Spacing'));
         container.appendChild(this._createChoiceRow(
             [
-                { value: 'small', label: 'Small' },
-                { value: 'medium', label: 'Medium' },
-                { value: 'large', label: 'Large' }
+                { value: 'small', label: 'Small', icon: BUTTON_GAP_ICONS.small },
+                { value: 'medium', label: 'Medium', icon: BUTTON_GAP_ICONS.medium },
+                { value: 'large', label: 'Large', icon: BUTTON_GAP_ICONS.large }
             ],
             this.data.gap,
             (value) => { this.data.gap = value; }
@@ -262,11 +270,18 @@ class ButtonTool {
         wrapper.className = 'button-settings-actions';
         const buttons = [];
         choices.forEach((choice) => {
-            const button = this._createStyleButton(this._html(choice.label), () => {
+            const content = choice.icon || this._html(choice.label);
+            const button = this._createStyleButton(content, () => {
                 onChoose(choice.value);
                 this._updatePreview();
                 this._setActive(buttons, button);
             });
+            // an icon says its name on hover, and to a screen reader
+            if (choice.icon) {
+                button.title = this._t(choice.label);
+                button.setAttribute('aria-label', this._t(choice.label));
+                button.classList.add('button-settings-icon-choice');
+            }
             buttons.push(button);
             if (choice.value === current) this._setActive([button], button);
             wrapper.appendChild(button);
