@@ -143,6 +143,44 @@
     }
 
     /**
+     * Makes room in the iframe for an open menu of Editor.js. The iframe is as
+     * tall as the body, and a menu is out of its flow: without the room, a
+     * menu longer than the blocks under it is cut by the iframe, which then
+     * scrolls inside the page.
+     */
+    function _fitOpenPopover() {
+        let bottom = 0;
+        document.querySelectorAll('.ce-popover--opened .ce-popover__container').forEach((menu) => {
+            bottom = Math.max(bottom, menu.getBoundingClientRect().bottom + window.scrollY);
+        });
+        const minHeight = bottom ? Math.ceil(bottom) + 16 + 'px' : '';
+        if (document.body.style.minHeight === minHeight) return;
+        document.body.style.minHeight = minHeight;
+        if (window.parentIFrame) window.parentIFrame.size();
+    }
+
+    function _setupPopoverFitting() {
+        let frame = null;
+        const schedule = () => {
+            if (frame !== null) return;
+            frame = window.requestAnimationFrame(() => {
+                frame = null;
+                _fitOpenPopover();
+            });
+        };
+        // a menu opens by a class, and changes size with its content; the
+        // style of the body, changed here, is not observed
+        new MutationObserver(schedule).observe(document.body, {
+            subtree: true,
+            childList: true,
+            attributes: true,
+            attributeFilter: ['class']
+        });
+        // a menu opens with an animation that scales it
+        document.addEventListener('animationend', schedule, true);
+    }
+
+    /**
      * A text of the iframe around the editor, in the language of the page.
      */
     function _t(text) {
@@ -418,6 +456,7 @@
             onReady: () => {
                 console.log('[DEBUG] 7. Editor.js is ready.');
                 _setupBulkListConversion(Boolean(tools.list));
+                _setupPopoverFitting();
                 if (window.parentIFrame) window.parentIFrame.size();
             },
 

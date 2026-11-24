@@ -350,6 +350,13 @@ tr:nth-child(even) {
     font-size: 13px;
 }
 
+/* The settings of a button block are a form: Editor.js gives its menus
+   200px by 270px, too little for it. */
+.ce-popover:has(.button-settings-add) {
+    --width: 300px;
+    --max-height: 600px;
+}
+
 .button-settings-item {
     padding-bottom: 10px;
     margin-bottom: 10px;
