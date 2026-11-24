@@ -6,6 +6,19 @@ from html.parser import HTMLParser
 from django.utils.html import strip_tags
 
 
+_UNSAFE_URL_RE = re.compile(r'^(javascript|data|vbscript):', re.IGNORECASE)
+# Browsers drop tabs and newlines anywhere in a URL, and control characters
+# and spaces at its start, before reading its scheme.
+_URL_IGNORED_CHARS_RE = re.compile(r'[\t\n\r]')
+_URL_LEADING_CHARS_RE = re.compile(r'^[\x00-\x20]+')
+
+
+def _is_unsafe_url(url):
+    """Whether a browser would run the URL as script or inline content."""
+    url = _URL_LEADING_CHARS_RE.sub('', _URL_IGNORED_CHARS_RE.sub('', str(url)))
+    return bool(_UNSAFE_URL_RE.match(url))
+
+
 class _InlineHTMLSanitizer(HTMLParser):
     """
     Allowlist sanitizer for the markup produced by the Editor.js inline
@@ -28,7 +41,6 @@ class _InlineHTMLSanitizer(HTMLParser):
         'span': {'class': CDX_CLASS_RE, 'style': FONT_SIZE_STYLE_RE},
         'sup': {}, 'sub': {}, 'br': {},
     }
-    UNSAFE_URL_RE = re.compile(r'^\s*(javascript|data|vbscript):', re.IGNORECASE)
 
     def __init__(self):
         super().__init__(convert_charrefs=False)
@@ -43,7 +55,7 @@ class _InlineHTMLSanitizer(HTMLParser):
             rule = allowed_attrs.get(name)
             if rule is None or value is None:
                 continue
-            if name == 'href' and self.UNSAFE_URL_RE.match(value):
+            if name == 'href' and _is_unsafe_url(value):
                 continue
             if rule is not True and not rule.match(value):
                 continue
@@ -211,7 +223,11 @@ class EditorJsRenderer:
     
     def render_button(self, data):
         text = self.escape(data.get("text", ""))
-        url = self.escape(data.get("url", "#"))
+        url = data.get("url", "#")
+        # As for the links in the text: a button must not run script.
+        if self.safe and _is_unsafe_url(url):
+            url = "#"
+        url = self.escape(url)
         css_class = self.escape(data.get("btnColor", "btn-secondary"))
         alignment = self.escape(data.get("alignment", "left"))
 

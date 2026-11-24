@@ -263,6 +263,40 @@ class RendererTest(TestCase):
         self.assertIn('<p><a href="/ok">ok</a></p>', rendered)
         self.assertIn("<p><a>bad</a></p>", rendered)
 
+    def test_inline_link_scheme_hidden_by_tab_or_space_is_stripped(self):
+        """A browser drops tabs inside a URL and spaces before it."""
+        for href in ('java&#x09;script:alert(1)', '&#x01; javascript:alert(1)'):
+            with self.subTest(href=href):
+                text = f'<a href="{href}">bad</a>'
+                data = {"blocks": [{"type": "paragraph", "data": {"text": text}}]}
+                self.assertEqual(EditorJsRenderer(data).render(), "<p><a>bad</a></p>")
+
+    def test_button_unsafe_url_is_replaced(self):
+        """A button URL that would run script or inline content becomes #."""
+        unsafe_urls = [
+            "javascript:alert(1)",
+            "  JaVaScRiPt:alert(1)",
+            "java\tscript:alert(1)",
+            "\x01javascript:alert(1)",
+            "data:text/html,<script>alert(1)</script>",
+            "vbscript:msgbox(1)",
+        ]
+        for url in unsafe_urls:
+            with self.subTest(url=url):
+                data = {"blocks": [{"type": "button", "data": {"text": "Go", "url": url}}]}
+                self.assertIn('<a href="#" ', EditorJsRenderer(data).render())
+
+    def test_button_safe_urls_are_kept(self):
+        for url in ("https://example.com/a", "/page", "mailto:a@example.com", "#top", "tel:123"):
+            with self.subTest(url=url):
+                data = {"blocks": [{"type": "button", "data": {"text": "Go", "url": url}}]}
+                self.assertIn(f'<a href="{url}" ', EditorJsRenderer(data).render())
+
+    def test_button_url_is_not_filtered_when_not_safe(self):
+        """With safe=False the content is trusted and left as it is."""
+        data = {"blocks": [{"type": "button", "data": {"text": "Go", "url": "javascript:go()"}}]}
+        self.assertIn('<a href="javascript:go()" ', EditorJsRenderer(data, safe=False).render())
+
     def test_inline_highlight_and_font_size_are_preserved(self):
         """Markup from the highlight and font size inline tools survives."""
         text = ('Some <mark class="cdx-marker">highlighted</mark> and '
