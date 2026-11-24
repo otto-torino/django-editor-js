@@ -30,6 +30,8 @@
     <div id="editor-js-holder"></div>
     
     <script src="{% static 'editor_js/js/vendor/editorjs/editorjs.min.js' %}"{% if csp_nonce is not None %} nonce="{{ csp_nonce }}"{% endif %}></script>
+    {# moves the blocks by dragging their ⋮⋮ handle: Editor.js does not #}
+    <script src="{% static 'editor_js/js/vendor/editorjs/drag-drop.min.js' %}"{% if csp_nonce is not None %} nonce="{{ csp_nonce }}"{% endif %}></script>
     <script src="{% static 'editor_js/js/vendor/iframe-resizer/iframeResizer.contentWindow.min.js' %}"{% if csp_nonce is not None %} nonce="{{ csp_nonce }}"{% endif %}></script>
 
     {% for name, config in tools_config.items %}

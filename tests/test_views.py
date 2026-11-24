@@ -90,6 +90,13 @@ class ViewsTest(TestCase):
         self.assertIn('<html lang="en-us">', html)
         self.assertEqual(i18n['messages']['ui']['popover']['Filter'], 'Filter')
 
+    def test_iframe_loads_the_dragging_of_the_blocks(self):
+        """Editor.js does not move the blocks by dragging: editorjs-drag-drop does."""
+        html = self.client.get(reverse('editor_js_iframe')).content.decode()
+
+        self.assertIn('editor_js/js/vendor/editorjs/drag-drop.min.js', html)
+        self.assertLess(html.index('editorjs.min.js'), html.index('drag-drop.min.js'))
+
     def test_iframe_has_no_inline_script(self):
         """
         Without a Content Security Policy no nonce is rendered, and every script

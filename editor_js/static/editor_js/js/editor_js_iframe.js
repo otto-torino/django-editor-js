@@ -457,6 +457,10 @@
                 console.log('[DEBUG] 7. Editor.js is ready.');
                 _setupBulkListConversion(Boolean(tools.list));
                 _setupPopoverFitting();
+                // the blocks move by dragging their ⋮⋮ handle (editorjs-drag-drop)
+                if (typeof window.DragDrop === 'function') {
+                    new window.DragDrop(_editorInstance);
+                }
                 if (window.parentIFrame) window.parentIFrame.size();
             },
 
